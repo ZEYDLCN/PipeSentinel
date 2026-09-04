@@ -1,0 +1,10 @@
+{
+  "fault_id": "F03",
+  "label": "Null oranı %2 → %40",
+  "target_dataset": "orders",
+  "description": "orders.total_amount için null oranı ~%40'a çıkar.",
+  "expected_signal_types": ["completeness"],
+  "expected_rule_id": "completeness_gap",
+  "min_confidence": 0.85,
+  "reference": "docs/pipeline-sentinel-design.md §16.1"
+}

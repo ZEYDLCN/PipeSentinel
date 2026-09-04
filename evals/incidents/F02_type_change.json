@@ -1,0 +1,10 @@
+{
+  "fault_id": "F02",
+  "label": "String → integer tip değişimi",
+  "target_dataset": "orders",
+  "description": "orders.status string kategoriden integer koda çevrilir (breaking change).",
+  "expected_signal_types": ["schema_type_mismatch"],
+  "expected_rule_id": "schema_type_change",
+  "min_confidence": 0.85,
+  "reference": "docs/pipeline-sentinel-design.md §16.1"
+}

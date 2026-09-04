@@ -1,0 +1,10 @@
+{
+  "fault_id": "F06",
+  "label": "Üç saat veri gecikmesi",
+  "target_dataset": "orders",
+  "description": "orders.created_at 3 saat geriye kaydırılır; SLA 90 dakika.",
+  "expected_signal_types": ["freshness"],
+  "expected_rule_id": "freshness_sla_breach",
+  "min_confidence": 0.6,
+  "reference": "docs/pipeline-sentinel-design.md §16.1"
+}

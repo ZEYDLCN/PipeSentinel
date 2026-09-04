@@ -1,0 +1,10 @@
+{
+  "fault_id": "F04",
+  "label": "Kayıtları iki kez yükleme",
+  "target_dataset": "orders",
+  "description": "orders tablosu aynı run içinde iki kez yüklenir (duplicate load).",
+  "expected_signal_types": ["volume", "uniqueness"],
+  "expected_rule_id": "duplicate_load",
+  "min_confidence": 0.85,
+  "reference": "docs/pipeline-sentinel-design.md §16.1"
+}

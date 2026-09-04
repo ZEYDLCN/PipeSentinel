@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pipeline Sentinel AI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Pipeline Sentinel</div>
+          <span class="brand-tag">AI · §13</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button data-view="datasets" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Datasets
+        </button>
+        <button data-view="incidents" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Incidents
+          <span class="nav-badge" id="nav-incident-count" hidden>0</span>
+        </button>
+        <button data-view="lineage" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M8.5 7.5 15.5 10.5M8.5 16.5 15.5 13.5"/></svg>
+          Lineage
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-pill"><span class="dot"></span> <span id="api-status-text">API bağlı</span></div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="page-title">Datasets</h1>
+          <p id="page-subtitle">Her dataset'in en son pipeline run'ı ve severity durumu.</p>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- ============================== DATASETS ============================== -->
+        <section id="view-datasets" class="view active">
+          <div class="stat-row" id="stat-row"></div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Pipeline kontrolleri</h2>
+                <div class="sub">Yeni bir run tetikleyin ya da kontrollü bir hata enjekte edin (§16.1).</div>
+              </div>
+              <div class="toolbar">
+                <button class="btn" id="btn-run-healthy">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Sağlıklı run çalıştır
+                </button>
+                <select id="fault-select"></select>
+                <button class="btn secondary" id="btn-run-fault">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  Hata enjekte et
+                </button>
+                <button class="btn ghost" id="btn-bootstrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+                  Baseline oluştur
+                </button>
+              </div>
+            </div>
+            <div id="datasets-table"><div class="empty">Yükleniyor…</div></div>
+          </div>
+        </section>
+
+        <!-- ============================== INCIDENTS ============================== -->
+        <section id="view-incidents" class="view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Incident listesi</h2>
+                <div class="sub">Filtreleyin ve bir satıra tıklayarak detayları görün.</div>
+              </div>
+              <div class="toolbar">
+                <select id="incident-dataset-filter"><option value="">Tüm dataset'ler</option></select>
+                <select id="incident-severity-filter">
+                  <option value="">Tüm severity</option>
+                  <option value="critical">critical</option>
+                  <option value="high">high</option>
+                  <option value="medium">medium</option>
+                  <option value="low">low</option>
+                </select>
+                <button class="btn ghost" id="btn-refresh-incidents">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+                  Yenile
+                </button>
+              </div>
+            </div>
+            <div id="incidents-table"><div class="empty">Yükleniyor…</div></div>
+          </div>
+
+          <div class="panel" id="incident-detail">
+            <h3 id="detail-summary"></h3>
+            <div class="meta" id="detail-meta"></div>
+            <button class="btn secondary" id="btn-reanalyze">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+              Yeniden analiz et
+            </button>
+
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Kök neden hipotezleri
+            </div>
+            <div id="detail-hypotheses"><div class="empty">Hipotez yok.</div></div>
+
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M8.5 7.5 15.5 10.5M8.5 16.5 15.5 13.5"/></svg>
+              Etkilenen varlıklar (lineage)
+            </div>
+            <div class="chip-row" id="detail-affected"></div>
+
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+              Önerilen aksiyonlar — taslak, insan onayı gerekir
+            </div>
+            <div id="detail-actions"><div class="empty">Aksiyon yok.</div></div>
+
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Belirsizlikler
+            </div>
+            <ul class="uncertainty-list" id="detail-uncertainties"></ul>
+
+            <div class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Sinyaller
+            </div>
+            <div id="detail-signals"></div>
+          </div>
+        </section>
+
+        <!-- ============================== LINEAGE ============================== -->
+        <section id="view-lineage" class="view">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Lineage graph</h2>
+                <div class="sub">Bir dataset (ör. <code>orders</code>) ya da kolon (ör. <code>orders.total_amount</code>) girin.</div>
+              </div>
+              <div class="toolbar">
+                <input type="text" id="lineage-input" placeholder="orders.total_amount" value="orders.total_amount" />
+                <button class="btn" id="btn-lineage-search">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  Sorgula
+                </button>
+              </div>
+            </div>
+            <div id="lineage-result">
+              <div class="empty">Yukarıdan bir varlık girip Sorgula'ya basın.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-stack"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: pipeline-sentinel-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sentinel
+      POSTGRES_PASSWORD: sentinel
+      POSTGRES_DB: pipeline_sentinel
+    ports:
+      - "5432:5432"
+    volumes:
+      - pipeline_sentinel_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinel -d pipeline_sentinel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pipeline_sentinel_pgdata:

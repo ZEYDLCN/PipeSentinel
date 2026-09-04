@@ -1,0 +1,10 @@
+{
+  "fault_id": "F01",
+  "label": "Kolon silme",
+  "target_dataset": "orders",
+  "description": "orders.customer_id kolonu upstream'de silinir.",
+  "expected_signal_types": ["schema_missing_column"],
+  "expected_rule_id": "schema_drop",
+  "min_confidence": 0.85,
+  "reference": "docs/pipeline-sentinel-design.md §16.1"
+}

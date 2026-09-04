@@ -1,0 +1,10 @@
+{
+  "fault_id": "F05",
+  "label": "TL → kuruş ölçek hatası",
+  "target_dataset": "orders",
+  "description": "orders.total_amount 100x ölçeklenir (§3.4 örnek uçtan uca olay).",
+  "expected_signal_types": ["range", "distribution"],
+  "expected_rule_id": "scale_error",
+  "min_confidence": 0.9,
+  "reference": "docs/pipeline-sentinel-design.md §3.4, §16.1"
+}
