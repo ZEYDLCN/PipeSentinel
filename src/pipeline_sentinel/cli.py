@@ -17,6 +17,8 @@
 
 from __future__ import annotations
 
+import sys
+
 import typer
 from rich.console import Console
 from rich.markup import escape
@@ -32,6 +34,17 @@ from .config import get_settings
 from .detector import DetectionReport
 from .faults import FAULT_CATALOG
 from .orchestrator import RunOutcome, execute_pipeline_run
+
+
+def _configure_utf8_console() -> None:
+    """Rich çıktısının Windows'un eski kod sayfalarında çökmesini önler."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8", errors="replace")
+
+
+_configure_utf8_console()
 
 app = typer.Typer(add_completion=False, help="Pipeline Sentinel AI — Faz 1 + Faz 3 + Faz 4 + Faz 7 CLI")
 lineage_app = typer.Typer(add_completion=False, help="Lineage graph komutları (§9)")
