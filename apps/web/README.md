@@ -1,5 +1,11 @@
 # apps/web
 
+Ana ekran `/` veya `/reliability.html`, sentetik veri laboratuvarı `/demo`
+adresindedir. İki ekran `theme.css` içindeki gri, krem, sarı ve kömür rengi
+tasarım dilini paylaşır. `reliability.css` ana ekranın responsive kart düzenini
+tanımlar. Özetler gerçek API sonuçlarından hesaplanır; boş durumda örnek veri
+gösterilmez. Ayrıntılı kurulum: `docs/reliability-guide-tr.md`.
+
 Faz 5 + Faz 7 Dashboard (§13, §14.3) — bağımlılıksız statik HTML/CSS/vanilla JS.
 Build adımı yok; `apps/api`'nin FastAPI uygulaması bu dizini kök path'e
 (`/`) mount eder ve `fetch`'ler aynı origin'deki `/api/v1/...` uçlarını

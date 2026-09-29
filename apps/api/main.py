@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
@@ -34,6 +34,8 @@ from pipeline_sentinel.orchestrator import execute_pipeline_run
 
 from . import schemas
 from .deps import get_engine
+from .auth import access_policy, identity
+from .reliability import router as reliability_router
 
 WEB_DIR = Path(__file__).resolve().parents[1] / "web"
 
@@ -43,9 +45,12 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.middleware("http")(access_policy)
+app.include_router(reliability_router)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -274,12 +279,12 @@ def get_lineage(
 
 @app.post("/api/v1/actions/{action_id}/approve", response_model=schemas.ActionOut)
 def approve_action(
-    action_id: str, payload: schemas.DecisionRequest, engine: Engine = Depends(get_engine)
+    action_id: str, payload: schemas.DecisionRequest, request: Request, engine: Engine = Depends(get_engine)
 ) -> dict[str, Any]:
     """Bir aksiyonu onaylar. Hiçbir SQL/dbt çalıştırmaz — yalnızca insan
     kararını kaydeder (§14.3); gerçek execution Faz 7'nin bilinçli olarak
     dışında bırakılan bir sonraki adımıdır (§22 "v1.5 Repair sandbox")."""
-    result = pipeline_module.decide_action(engine, action_id, "approve", actor=payload.actor, note=payload.note)
+    result = pipeline_module.decide_action(engine, action_id, "approve", actor=identity(request)["actor"], note=payload.note)
     if result is None:
         raise HTTPException(status_code=404, detail="aksiyon bulunamadı")
     return result
@@ -287,9 +292,9 @@ def approve_action(
 
 @app.post("/api/v1/actions/{action_id}/reject", response_model=schemas.ActionOut)
 def reject_action(
-    action_id: str, payload: schemas.DecisionRequest, engine: Engine = Depends(get_engine)
+    action_id: str, payload: schemas.DecisionRequest, request: Request, engine: Engine = Depends(get_engine)
 ) -> dict[str, Any]:
-    result = pipeline_module.decide_action(engine, action_id, "reject", actor=payload.actor, note=payload.note)
+    result = pipeline_module.decide_action(engine, action_id, "reject", actor=identity(request)["actor"], note=payload.note)
     if result is None:
         raise HTTPException(status_code=404, detail="aksiyon bulunamadı")
     return result
@@ -308,4 +313,14 @@ def get_action_approvals(action_id: str, engine: Engine = Depends(get_engine)) -
 # ---------------------------------------------------------------------------
 
 if WEB_DIR.exists():
+    from fastapi.responses import FileResponse
+
+    @app.get("/", include_in_schema=False)
+    def dashboard():
+        return FileResponse(WEB_DIR / "reliability.html")
+
+    @app.get("/demo", include_in_schema=False)
+    def demo_dashboard():
+        return FileResponse(WEB_DIR / "index.html")
+
     app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="web")

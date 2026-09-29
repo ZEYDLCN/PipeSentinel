@@ -1,0 +1,1 @@
+{"type": "scale", "column": "total_amount", "factor": 0.01, "where": {"batch": "bad"}, "max_changed_rows": 1000}

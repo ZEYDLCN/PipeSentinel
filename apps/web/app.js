@@ -2,9 +2,9 @@ const API = "/api/v1";
 let currentIncidentId = null;
 
 const PAGE_META = {
-  datasets: { title: "Datasets", subtitle: "Her dataset'in en son pipeline run'ı ve severity durumu." },
-  incidents: { title: "Incidents", subtitle: "Root Cause Agent tarafından üretilen kanıtlı kök neden raporları (§10-§12)." },
-  lineage: { title: "Lineage", subtitle: "Downstream etki ve olası upstream kaynakları keşfedin (§9)." },
+  datasets: { title: "Veri laboratuvarınız.", subtitle: "Akışları deneyin, değişimleri keşfedin ve sonuçları inceleyin." },
+  incidents: { title: "Her olayın bir açıklaması var.", subtitle: "Kök nedenleri inceleyin ve kanıta dayalı aksiyonlar alın." },
+  lineage: { title: "Bağlantıların büyük resmi.", subtitle: "Verinizin yolculuğunu ve değişimlerin etkisini keşfedin." },
 };
 
 // ---------------------------------------------------------------------------
@@ -77,7 +77,7 @@ function showToast(message, type = "info", timeout = 4200) {
 // tab geçişi
 // ---------------------------------------------------------------------------
 
-document.querySelectorAll("nav.nav .nav-item").forEach((btn) => {
+document.querySelectorAll("nav.nav button[data-view]").forEach((btn) => {
   btn.addEventListener("click", () => {
     const view = btn.dataset.view;
     document.querySelectorAll("nav.nav .nav-item").forEach((b) => b.classList.remove("active"));

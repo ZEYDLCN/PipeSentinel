@@ -1,5 +1,15 @@
 # Pipeline Sentinel AI
 
+## Gerçek kaynaklar ve onarım doğrulaması
+
+PostgreSQL connector, YAML sözleşmeleri, kalite onaylı/mevsimsel baseline,
+dbt/OpenLineage ingestion, olay gruplama, iş etkisi, çözüm hafızası,
+izole onarım doğrulaması, rol kontrolü, webhook outbox ve CI veri farkı kapısı
+eklendi. Yeni dashboard: `/` (ve `/reliability.html`); veri laboratuvarı: `/demo`.
+
+Kurulum, worker, pilot erişimi ve kapsam sınırları:
+[`docs/reliability-guide-tr.md`](docs/reliability-guide-tr.md).
+
 Self-healing data pipeline agent — veri pipeline bozulmalarını saptar, kök
 nedeni açıklar ve kontrollü onarım üretir. Tam mimari ve ürün tasarımı için
 [`docs/pipeline-sentinel-design.md`](docs/pipeline-sentinel-design.md)
@@ -20,9 +30,10 @@ uygulanabilir kod olarak içerir — Faz 1'den Faz 7'ye:
 - Approval workflow: önerilen aksiyonları onayla/reddet — hiçbir SQL/dbt otomatik çalıştırılmaz (§14.3)
 - `sentinel` CLI: bir pipeline run'ını üret → yükle → profille → tespit et → etkisini graf üzerinde göster → kök nedeni analiz et → aksiyonu onayla/reddet
 
-Kasıtlı olarak dışarıda bırakılanlar (gerçek OpenLineage ingestion,
-RAG/vector search, repair sandbox + otomatik execution) "Uygulama durumu"
-notlarında ve [Yol haritası](#yol-haritası) altında işaretli.
+Gerçek kaynak akışı OpenLineage ingestion ve repair sandbox'ı içerir.
+Üretimde otomatik execution ve vector search kapsam dışındadır; aşağıdaki
+faz listesi ilk sentetik demo sürümünü anlatır. Güncel kapsam için
+[gerçek kaynak kılavuzuna](docs/reliability-guide-tr.md) bakın.
 
 ## Hızlı başlangıç
 
@@ -73,7 +84,8 @@ pip install -e ".[dev,api]"
 python -m uvicorn apps.api.main:app --reload --port 8000
 ```
 
-- Dashboard: <http://localhost:8000/> — datasets, incidents, lineage explorer;
+- Genel bakış: <http://localhost:8000/> — gerçek kaynaklar, aktivite ve veri sağlığı.
+- Veri laboratuvarı: <http://localhost:8000/demo> — datasets, incidents, lineage explorer;
   tek tıkla sağlıklı run / hata enjeksiyonu (F01-F06 seçilebilir; enjeksiyon
   sonrası RCA agent'ı otomatik tetiklenir). Incident detayında her önerilen
   aksiyon için Onayla/Reddet butonları (§14.3) — hiçbir SQL/dbt otomatik

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pipeline Sentinel AI</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="theme.css" />
 </head>
 <body>
   <div class="shell">
@@ -14,24 +15,25 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
         </div>
         <div>
-          <div class="brand-name">Pipeline Sentinel</div>
+          <div class="brand-name">PipeSentinel</div>
           <span class="brand-tag">AI · §13</span>
         </div>
       </div>
 
       <nav class="nav">
+        <a href="/" class="nav-item">Genel bakış ↗</a>
         <button data-view="datasets" class="nav-item active">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-          Datasets
+          Veri kümeleri
         </button>
         <button data-view="incidents" class="nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          Incidents
+          Olaylar
           <span class="nav-badge" id="nav-incident-count" hidden>0</span>
         </button>
         <button data-view="lineage" class="nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M8.5 7.5 15.5 10.5M8.5 16.5 15.5 13.5"/></svg>
-          Lineage
+          Bağımlılıklar
         </button>
       </nav>
 
@@ -43,8 +45,8 @@
     <div class="main">
       <header class="topbar">
         <div>
-          <h1 id="page-title">Datasets</h1>
-          <p id="page-subtitle">Her dataset'in en son pipeline run'ı ve severity durumu.</p>
+          <h1 id="page-title">Veri laboratuvarınız.</h1>
+          <p id="page-subtitle">Akışları deneyin, değişimleri keşfedin ve sonuçları inceleyin.</p>
         </div>
       </header>
 

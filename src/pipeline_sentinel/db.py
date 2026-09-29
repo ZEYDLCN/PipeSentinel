@@ -39,6 +39,9 @@ def run_migrations(engine: Engine) -> list[str]:
             sql = path.read_text(encoding="utf-8")
             conn.execute(text(sql))
             applied.append(path.name)
+        from .reliability_store import metadata
+        metadata.create_all(conn)
+        applied.append("reliability_metadata_v1")
     return applied
 
 

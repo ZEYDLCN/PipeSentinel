@@ -1,0 +1,55 @@
+name: Snapshot data quality gate
+on:
+  workflow_call:
+    inputs:
+      base_ref:
+        required: true
+        type: string
+      candidate_ref:
+        required: true
+        type: string
+      snapshot_path:
+        required: true
+        type: string
+      contract_path:
+        required: true
+        type: string
+      keys:
+        required: true
+        type: string
+      max_change_ratio:
+        default: '0'
+        type: string
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base_ref }}
+          path: base
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_ref }}
+          path: candidate
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -e './base[dev]'
+      - name: Compare snapshots and validate candidate contract
+        env:
+          SNAPSHOT: ${{ inputs.snapshot_path }}
+          CONTRACT: ${{ inputs.contract_path }}
+          KEYS: ${{ inputs.keys }}
+          MAX_CHANGE: ${{ inputs.max_change_ratio }}
+        run: >-
+          sentinel reliability ci-check "base/$SNAPSHOT" "candidate/$SNAPSHOT"
+          --contract "base/$CONTRACT" --keys "$KEYS" --max-change-ratio "$MAX_CHANGE"
+          --output reports/data-quality.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: data-quality-report
+          path: reports/data-quality.json

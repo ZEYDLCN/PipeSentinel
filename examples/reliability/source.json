@@ -1,0 +1,21 @@
+{
+  "connection_env": "SENTINEL_SOURCE_COMMERCE",
+  "schema": "public",
+  "table": "orders",
+  "allowlist": ["public.orders"],
+  "max_rows": 10000,
+  "timeout_seconds": 30,
+  "order_by": ["order_id"],
+  "segment_by": ["batch"],
+  "retain_snapshot": true,
+  "lineage_asset": "model.commerce.orders",
+  "contract": {
+    "version": 1,
+    "expected_schema": {"order_id": "integer", "batch": "string", "total_amount": "float"},
+    "rules": [
+      {"type": "not_null", "column": "order_id"},
+      {"type": "uniqueness", "column": "order_id"},
+      {"type": "range", "column": "total_amount", "min": 0, "max": 1000}
+    ]
+  }
+}

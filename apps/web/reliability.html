@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#e9e9dc"><title>Pipeline Sentinel AI · Veri güvenilirliği</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="reliability.css"></head>
+<body>
+<div class="workspace">
+  <header class="workspace-head">
+    <a class="wordmark" href="/" aria-label="PipeSentinel ana sayfa">Pipe<span>Sentinel</span><span class="brand-dot" aria-hidden="true"></span></a>
+    <nav class="workspace-tabs" aria-label="Çalışma alanı"><button data-tab="monitor" class="btn" aria-current="page">Genel bakış</button><button data-tab="sources" class="btn secondary">Kaynaklar</button><button data-tab="lineage" class="btn secondary">Bağımlılıklar</button><button data-tab="policies" class="btn secondary">İş etkisi</button><button data-tab="notifications" class="btn secondary">Bildirimler<span id="notification-dot" class="notification-dot" hidden></span></button></nav>
+    <div class="head-actions"><button id="login" class="btn secondary"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg><span>Oturum aç</span></button></div>
+  </header>
+  <div class="welcome-row"><div><div class="eyebrow"><span class="live-dot"></span> VERİ GÜVENİLİRLİĞİ ÇALIŞMA ALANI</div><h1>Her akış, kontrol altında.</h1><p>Verinizi tanıyın. Değişimi görün. Güvenle ilerleyin.</p></div><div class="welcome-meta"><span id="today-label"></span><span id="session-state">Bağlanıyor…</span></div></div>
+  <p id="message" role="status" aria-live="polite"></p>
+  <section id="tab-monitor">
+    <div class="overview-strip">
+      <div class="quality-breakdown"><div class="strip-title">Analizlerin genel görünümü <span>Son 50 analiz</span></div><div class="quality-labels"><span>Temiz <b id="clean-percent">—</b></span><span>İncelenmeli <b id="issue-percent">—</b></span><span>Baseline <b id="baseline-count">—</b></span></div><div class="quality-track" aria-label="Analiz dağılımı"><span id="clean-track" class="track-clean"></span><span id="issue-track" class="track-issue"></span><span class="track-pattern"></span></div></div>
+      <div class="headline-metrics"><div><strong id="metric-sources">—</strong><span><span aria-hidden="true">◫</span> Veri kaynağı</span></div><div><strong id="metric-analyses">—</strong><span><span aria-hidden="true">↗</span> Analiz</span></div><div><strong id="metric-incidents">—</strong><span><span aria-hidden="true">◎</span> İnceleme</span></div></div>
+    </div>
+    <div class="bento-grid">
+      <article class="bento-card flow-card">
+        <div class="card-top"><span class="pill">PIPELINE SENTINEL</span><span class="tiny-orbit" aria-hidden="true">✳</span></div>
+        <div class="flow-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="flow-core"><svg viewBox="0 0 48 48"><path d="m24 7 15 8-15 8-15-8Z"/><path d="m9 24 15 8 15-8M9 33l15 8 15-8"/></svg></div><span class="flow-node node-one">↗</span><span class="flow-node node-two">✓</span><span class="flow-node node-three">⋮</span></div>
+        <div class="flow-caption"><h2>Güven, her katmanda.</h2><p>Kaynağından son kararınıza.</p><button class="circle-button" id="overview-add-source" aria-label="Kaynak ekle">↗</button></div>
+      </article>
+      <article class="bento-card activity-card"><div class="card-top"><h2>Analiz aktivitesi</h2><button class="circle-button" id="overview-analyses" aria-label="Tüm analizlere git">↗</button></div><div class="activity-summary"><strong id="weekly-total">—</strong><span>analiz<br>son 7 günde</span><span class="pill" id="activity-trend">Bu hafta</span></div><div id="activity-chart" class="activity-chart" aria-label="Günlük analiz sayıları"></div><div class="card-foot"><span class="mini-dot"></span> İşlenen analizler <span id="activity-range"></span></div></article>
+      <article class="bento-card health-card"><div class="card-top"><h2>Veri sağlığı</h2><button class="circle-button" id="overview-health" aria-label="Analiz kapsamını incele">↗</button></div><div class="health-dial"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="dial-ticks" cx="100" cy="100" r="85"/><circle class="dial-track" cx="100" cy="100" r="72"/><circle id="health-arc" class="dial-fill" cx="100" cy="100" r="72"/></svg><div class="dial-label"><strong id="health-value">—</strong><span>temiz analiz</span></div></div><div class="health-bottom"><span id="health-caption">Henüz analiz yok</span><button class="circle-button dark-circle" id="overview-refresh" aria-label="Verileri yenile">↻</button></div></article>
+      <aside class="bento-card queue-card"><div class="card-top"><h2>İş akışı</h2><strong id="queue-ratio">—</strong></div><p class="queue-subtitle">Analizden güvenilir sonuca.</p><div class="queue-segments"><div><span>Tamamlanan</span><strong id="queue-done">0</strong></div><div><span>Çalışan</span><strong id="queue-running">0</strong></div><div><span>Bekleyen</span><strong id="queue-pending">0</strong></div></div><div class="queue-stack"><div class="queue-dark"><div class="card-top"><h3>Son işlemler</h3><span id="queue-total" class="pill">0 iş</span></div><div id="queue-preview" class="queue-preview"><p>İlk analiziniz burada görünecek.</p></div><button class="queue-link" id="overview-jobs">Tüm işlemleri görüntüle <span>↗</span></button></div></div></aside>
+      <article class="bento-card sources-card"><div class="card-top"><h2>Kaynaklarınız</h2><button class="circle-button small-circle" id="overview-sources" aria-label="Kaynakları yönet">↗</button></div><div id="source-preview"><p>İlk veri kaynağınızı bağlayın.</p></div><a class="quiet-link" href="/demo">Veri laboratuvarını keşfet <span>↗</span></a></article>
+      <article class="bento-card timeline-card"><div class="card-top"><h2>Son hareketler</h2><span id="timeline-date" class="pill">Bugün</span></div><div id="activity-timeline" class="activity-timeline"><p>Analizler tamamlandıkça zaman çizelgeniz oluşur.</p></div></article>
+    </div>
+    <div class="panel analyses-panel" id="analyses-panel"><div class="section-heading"><div><span class="eyebrow">DAHA YAKINDAN BAKIN</span><h2>Analiz geçmişi</h2><p>Her değişimin arkasındaki kanıtı keşfedin.</p></div><button id="refresh" class="btn ghost">Yenile <span aria-hidden="true">↻</span></button></div><div id="observations"></div></div>
+    <div class="panel jobs-panel" id="jobs-panel"><div class="section-heading"><div><h2>Analiz kuyruğu</h2><p>İşlerin durumunu ve tekrar denemelerini takip edin.</p></div><span class="pill">CANLI AKIŞ</span></div><div id="jobs"></div></div><article id="observation-detail" class="panel" hidden></article>
+  </section>
+  <section id="tab-sources" hidden><div class="panel"><h2>Bağlı kaynaklar</h2><div id="sources"></div></div><form id="source-form" class="panel"><h2>Kaynak ekle / güncelle</h2><p>Aynı adla kaydetmek mevcut kaynağı günceller. Bağlantı şifresi sunucudaki ortam değişkeninde tutulur.</p><div class="form-grid">
+    <label>Kaynak adı<input name="name" required maxlength="160" placeholder="Siparişler"></label>
+    <label>Bağlantı değişkeni<input name="connection_env" required value="SENTINEL_SOURCE_COMMERCE"></label>
+    <label>Şema<input name="schema" required value="public"></label><label>Tablo<input name="table" required value="orders"></label>
+    <label>En fazla incelenecek satır<input name="max_rows" type="number" min="1" max="100000" value="10000" required></label>
+    <label>Sorgu süresi sınırı (saniye)<input name="timeout_seconds" type="number" min="1" max="120" value="30" required></label>
+    <label>Sıralama kolonları<input name="order_by" value="order_id" placeholder="Virgülle ayırın"></label>
+    <label>Segment kolonları<input name="segment_by" placeholder="Örn. currency,country"></label>
+    <label>Hassas kolonlar<input name="sensitive_columns" placeholder="Örn. email"></label>
+    <label>Lineage varlığı<input name="lineage_asset" placeholder="model.commerce.orders"></label>
+    <label>Partition kolonu<input name="partition_column" placeholder="İsteğe bağlı"></label>
+    <label>Partition başlangıcı<input name="partition_start" placeholder="Dahil"></label><label>Partition bitişi<input name="partition_end" placeholder="Hariç"></label>
+    <label class="checkbox"><input name="seasonal" type="checkbox"> Haftanın günü ve saatine göre karşılaştır</label>
+    <label class="checkbox"><input name="retain_snapshot" type="checkbox"> Onarım denemesi için veri kopyasını sakla</label>
+  </div><label>Veri sözleşmesi (YAML)<textarea name="contract" rows="15" spellcheck="false" required>version: 1
+expected_schema:
+  order_id: integer
+  batch: string
+  total_amount: float
+rules:
+  - type: uniqueness
+    column: order_id
+  - type: range
+    column: total_amount
+    min: 0
+    max: 1000</textarea></label><div class="toolbar"><button type="button" id="validate-contract" class="btn secondary">Sözleşmeyi doğrula</button><button class="btn">Kaydet</button></div></form></section>
+  <section id="tab-lineage" hidden><div class="panel"><h2>Gerçek bağımlılıklar</h2><p>Bağlantılar olası etkiyi gösterir; veri bozulduğunun kanıtı değildir.</p><div id="graphs"></div></div><form id="ingest-form" class="panel"><h2>Bağımlılıkları içeri al</h2><div class="form-grid"><label>Proje / namespace<input name="namespace" required value="commerce"></label><label>Tür<select name="kind"><option value="dbt">dbt manifest</option><option value="openlineage">OpenLineage olayı</option></select></label><label>JSON dosyası<input name="artifact" type="file" accept=".json" required></label><label>dbt run_results (isteğe bağlı)<input name="results" type="file" accept=".json"></label></div><button class="btn">İçeri al</button></form></section>
+  <section id="tab-policies" hidden><div class="panel"><h2>Varlık sahipleri ve kritik raporlar</h2><div id="policies"></div></div><form id="policy-form" class="panel"><h2>İş etkisi tanımı</h2><div class="form-grid"><label>Varlık kimliği<input name="asset" required placeholder="exposure.commerce.finance"></label><label>Sahibi<input name="owner" required placeholder="Finans ekibi"></label><label>Kritiklik (1–5)<input name="criticality" type="number" min="1" max="5" value="3" required></label><label>SLA (dakika)<input name="sla_minutes" type="number" min="1" value="60" required></label></div><button class="btn">Kaydet</button></form></section>
+  <section id="tab-notifications" hidden><div class="panel"><h2>Bildirim kutusu</h2><p>Olaylar burada saklanır. Webhook teslimi yapılandırılmış işleyicide açılır.</p><div id="notifications"></div></div></section>
+  <footer><span>PipeSentinel <span class="footer-dot">•</span> Veriye duyulan güven.</span><div><a href="/docs">API belgeleri ↗</a><a href="/demo">Veri laboratuvarı ↗</a></div></footer>
+</div>
+<dialog id="login-dialog"><form id="login-form"><h2>Oturum aç</h2><label>Erişim anahtarı<input name="token" type="password" autocomplete="off" required></label><p>Anahtar yalnızca bu sayfanın belleğinde tutulur.</p><button class="btn">Bağlan</button><button type="button" id="cancel-login" class="btn secondary">Kapat</button></form></dialog>
+<script src="reliability.js"></script>
+</body></html>

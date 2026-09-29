@@ -52,6 +52,8 @@ app.add_typer(lineage_app, name="lineage")
 actions_app = typer.Typer(add_completion=False, help="Önerilen aksiyonlar / approval workflow (§14.3)")
 app.add_typer(actions_app, name="actions")
 console = Console()
+from .reliability_cli import app as reliability_app
+app.add_typer(reliability_app, name="reliability")
 
 
 @app.command()

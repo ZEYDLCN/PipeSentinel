@@ -1,0 +1,14 @@
+version: 1
+expected_schema:
+  order_id: integer
+  batch: string
+  total_amount: float
+rules:
+  - type: not_null
+    column: order_id
+  - type: uniqueness
+    column: order_id
+  - type: range
+    column: total_amount
+    min: 0
+    max: 1000

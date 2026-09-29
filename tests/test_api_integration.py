@@ -138,7 +138,7 @@ def test_full_f05_flow_run_analyze_incident_lineage(client):
     assert resp.status_code == 200
     approvals = resp.json()
     assert len(approvals) == 1
-    assert approvals[0]["actor"] == "frank"
+    assert approvals[0]["actor"] == "local-dev"  # client-supplied actor is not trusted
 
     other_action_id = [a["id"] for a in detail["recommended_actions"] if a["id"] != action_id][0]
     resp = client.post(f"/api/v1/actions/{other_action_id}/reject", json={"actor": "grace"})
@@ -178,11 +178,11 @@ def test_reject_unknown_action_404(client):
     assert resp.status_code == 404
 
 
-def test_approval_requires_actor_field(client):
+def test_approval_uses_server_identity_without_actor_field(client):
     resp = client.post(
         "/api/v1/actions/00000000-0000-0000-0000-000000000000/approve", json={}
     )
-    assert resp.status_code == 422  # pydantic validation, actor zorunlu
+    assert resp.status_code == 404  # identity is server-owned; unknown action still returns 404
 
 
 def test_get_pipeline_run_404_for_unknown_id(client):

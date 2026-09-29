@@ -40,6 +40,8 @@ class Violation:
 
 def _dtype_matches(series: pd.Series, expected: str) -> bool:
     kinds = _TYPE_KIND.get(expected, "")
+    if expected == "string":
+        return pd.api.types.is_string_dtype(series.dtype) or series.dtype.kind == "O"
     if expected == "datetime":
         return "datetime" in str(series.dtype) or series.dtype.kind == "M"
     return series.dtype.kind in kinds

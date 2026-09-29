@@ -66,7 +66,7 @@ class ApprovalOut(BaseModel):
 
 
 class DecisionRequest(BaseModel):
-    actor: str
+    actor: str | None = None  # Legacy input; authenticated identity is authoritative.
     note: str | None = None
 
 

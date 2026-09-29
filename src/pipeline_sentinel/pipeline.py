@@ -216,6 +216,7 @@ def get_baseline_profile(
                 WHERE job_id = :job_id
                   AND status = 'success'
                   AND fault_id IS NULL
+                  AND NOT EXISTS (SELECT 1 FROM signals s WHERE s.run_id = job_runs.id)
                   {exclude_clause}
                 ORDER BY started_at DESC
                 LIMIT 1
