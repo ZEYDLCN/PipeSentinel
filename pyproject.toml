@@ -30,6 +30,18 @@ api = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.29",
 ]
+e2e = [
+    "playwright>=1.40",
+]
+duckdb = [
+    "duckdb>=1.0",
+]
+ml = [
+    "scikit-learn>=1.3",
+]
+lineage = [
+    "sqlglot>=25",
+]
 
 [project.scripts]
 sentinel = "pipeline_sentinel.cli:app"

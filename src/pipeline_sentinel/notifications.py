@@ -17,6 +17,18 @@ class NoRedirect(HTTPRedirectHandler):
         return None
 
 
+SEVERITY_ICONS = {"critical": ":red_circle:", "high": ":large_orange_circle:",
+                  "medium": ":large_yellow_circle:", "low": ":white_circle:"}
+
+
+def slack_payload(body):
+    """Slack/Mattermost uyumlu gelen webhook gövdesi; ham satır veya örnek değer içermez."""
+    icon = SEVERITY_ICONS.get(body.get("severity"), ":white_circle:")
+    return {"text": f"{icon} *{body.get('source', 'kaynak')}*: {body.get('signal_count', 0)} sinyal · "
+                    f"önem {body.get('severity', '?')} · iş önceliği {body.get('priority', '?')}\n"
+                    f"Analiz: `{body.get('observation_id', '?')}`"}
+
+
 def deliver_one(engine):
     url = os.environ.get("SENTINEL_WEBHOOK_URL", "")
     secret = os.environ.get("SENTINEL_WEBHOOK_SECRET", "")
@@ -25,6 +37,9 @@ def deliver_one(engine):
     parsed = urlsplit(url)
     if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password or len(secret) < 24:
         raise ValueError("Webhook HTTPS adresi ve en az 24 karakter imza sırrı gerekli")
+    webhook_format = os.environ.get("SENTINEL_WEBHOOK_FORMAT", "json")
+    if webhook_format not in {"json", "slack"}:
+        raise ValueError("SENTINEL_WEBHOOK_FORMAT json veya slack olmalı")
     with engine.begin() as conn:
         conn.execute(update(store.notifications).where(store.notifications.c.status == "sending",
                      store.notifications.c.lease_until < store.now()).values(status="failed", error="Teslim işleyicisi kesildi"))
@@ -41,7 +56,8 @@ def deliver_one(engine):
                                lease_until=(datetime.now(timezone.utc) + timedelta(seconds=60)).isoformat()))
         if updated.rowcount != 1:
             return None
-    body = json.dumps(row["body"], sort_keys=True).encode()
+    payload = slack_payload(row["body"]) if webhook_format == "slack" else row["body"]
+    body = json.dumps(payload, sort_keys=True).encode()
     request = Request(url, data=body, headers={"Content-Type": "application/json",
                       "X-Sentinel-Event": row["id"], "X-Sentinel-Signature": hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()})
     status, error = "sent", None

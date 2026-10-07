@@ -47,9 +47,13 @@ jobs:
         run: >-
           sentinel reliability ci-check "base/$SNAPSHOT" "candidate/$SNAPSHOT"
           --contract "base/$CONTRACT" --keys "$KEYS" --max-change-ratio "$MAX_CHANGE"
-          --output reports/data-quality.json
+          --output reports/data-quality.json --markdown reports/data-quality.md
+      - name: Publish summary
+        if: always()
+        run: |
+          if [ -f reports/data-quality.md ]; then cat reports/data-quality.md >> "$GITHUB_STEP_SUMMARY"; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: data-quality-report
-          path: reports/data-quality.json
+          path: reports/

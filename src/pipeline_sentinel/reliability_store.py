@@ -30,6 +30,17 @@ observations = table("observations", Column("source_id", String(36), nullable=Fa
                      Column("job_id", String(36), unique=True, nullable=False),
                      Column("quality", String(20), nullable=False), Column("contract_hash", String(64)),
                      Column("body", JSON, nullable=False))
+snapshots = table("snapshots", Column("observation_id", String(36), unique=True, nullable=False),
+                  Column("data", JSON, nullable=False))
+workers = table("workers", Column("name", String(160), unique=True, nullable=False),
+                Column("last_seen", String(40), nullable=False), Column("started_at", String(40)),
+                Column("details", JSON))
+triage = table("triage", Column("observation_id", String(36), unique=True, nullable=False),
+               Column("status", String(20), nullable=False), Column("assignee", String(160)),
+               Column("note", Text), Column("actor", String(160)))
+mutes = table("mutes", Column("source_id", String(36), nullable=False), Column("signal_type", String(60), nullable=False),
+              Column("column_name", String(160)), Column("until", String(40), nullable=False),
+              Column("reason", Text), Column("actor", String(160)))
 baselines = table("baseline_versions", Column("source_id", String(36), nullable=False),
                   Column("observation_id", String(36), unique=True, nullable=False), Column("actor", String(160)))
 events = table("change_events", Column("kind", String(40)), Column("source_id", String(36)),

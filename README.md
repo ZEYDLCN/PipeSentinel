@@ -25,12 +25,22 @@ dbt/OpenLineage ingestion, olay gruplama, iş etkisi, çözüm hafızası,
 izole onarım doğrulaması, rol kontrolü, webhook outbox ve CI veri farkı kapısı
 eklendi. Yeni dashboard: `/` (ve `/reliability.html`); veri laboratuvarı: `/demo`.
 
+Sürekli izleme (kaynak başına zamanlama, CSV'den taslak sözleşme, "beklenen
+değişim" kabulü, standart hata tabanlı kayma tespiti, değişiklik adayları) ve
+rakip karşılaştırması: [`docs/product-review-tr.md`](docs/product-review-tr.md). İsteğe bağlı
+yetenekler için ek paketler: `pip install -e ".[duckdb,ml,lineage]"` (DuckDB connector'ı,
+Isolation Forest, dbt SQL'inden kolon lineage'ı).
+
 Kurulum, worker, pilot erişimi ve kapsam sınırları:
 [`docs/reliability-guide-tr.md`](docs/reliability-guide-tr.md).
 
 Self-healing data pipeline agent — veri pipeline bozulmalarını saptar, kök
 nedeni açıklar ve kontrollü onarım üretir. Tam mimari ve ürün tasarımı için
 [`docs/pipeline-sentinel-design.md`](docs/pipeline-sentinel-design.md)
+dokümanına bakın.
+
+Mevcut uygulamanın teknoloji yığını, veri modeli ve uçtan uca çalışma akışı
+için [`docs/technical-overview-tr.md`](docs/technical-overview-tr.md)
 dokümanına bakın.
 
 Bu repo, o tasarımın 7 fazlık planının (§17) **çekirdeğini uçtan uca**

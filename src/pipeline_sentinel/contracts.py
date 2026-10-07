@@ -8,6 +8,7 @@ uygular ve ihlalleri `Violation` olarak döner — LLM'e gitmeden önce
 
 from __future__ import annotations
 
+import operator
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
@@ -24,6 +25,12 @@ _TYPE_KIND = {
     "string": "O",
     "boolean": "b",
     "datetime": "M",
+}
+
+
+_COMPARE = {
+    "<": operator.lt, "<=": operator.le, ">": operator.gt,
+    ">=": operator.ge, "==": operator.eq, "!=": operator.ne,
 }
 
 
@@ -193,6 +200,43 @@ def check_rules(df: pd.DataFrame, rules: list[dict[str, Any]]) -> list[Violation
                         message=f"{col} için beklenmeyen kategori değerleri: {sorted(unexpected)}",
                         evidence={"unexpected_values": sorted(unexpected), "allowed_values": sorted(allowed)},
                         severity="medium",
+                    )
+                )
+
+        elif rtype == "row_count":
+            lo, hi = rule.get("min_rows"), rule.get("max_rows")
+            if (lo is not None and row_count < lo) or (hi is not None and row_count > hi):
+                violations.append(
+                    Violation(
+                        rule_type="row_count",
+                        column=None,
+                        message=f"Satır sayısı {row_count}, sözleşmedeki aralık [{lo}, {hi}] dışında",
+                        evidence={"row_count": row_count, "min_rows": lo, "max_rows": hi},
+                    )
+                )
+
+        elif rtype == "column_compare":
+            other, op = rule["other"], rule["operator"]
+            if col not in df.columns or other not in df.columns:
+                continue
+            both = df[col].notna() & df[other].notna()
+            try:
+                ok = _COMPARE[op](df.loc[both, col], df.loc[both, other])
+            except (TypeError, ValueError):
+                continue  # tip uyuşmazlığı zaten schema_type_mismatch olarak raporlanır
+            bad = int((~ok).sum())
+            if bad:
+                violations.append(
+                    Violation(
+                        rule_type="column_compare",
+                        column=col,
+                        message=f"{bad} satırda '{col} {op} {other}' ilişkisi bozuk",
+                        evidence={
+                            "other": other,
+                            "operator": op,
+                            "violation_count": bad,
+                            "violation_ratio": round(bad / row_count, 6) if row_count else 0.0,
+                        },
                     )
                 )
 

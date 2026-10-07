@@ -6,6 +6,7 @@ import json
 import multiprocessing
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 
 from .contract_io import at_time, digest
@@ -28,6 +29,19 @@ def restore(data):
     return frame
 
 
+def _plain(value):
+    """JSON'a güvenle yazılabilen skaler (numpy/Timestamp/NaN dönüşümleri)."""
+    if value is None or (not isinstance(value, (list, tuple)) and pd.isna(value)):
+        return None
+    if isinstance(value, pd.Timestamp):
+        return value.isoformat()
+    return value.item() if hasattr(value, "item") else value
+
+
+def _plain_key(key):
+    return [_plain(part) for part in key] if isinstance(key, tuple) else _plain(key)
+
+
 def data_diff(before, after, keys: list[str], max_change_ratio=0.0):
     if not keys or any(k not in before or k not in after for k in keys):
         raise ValueError("Her iki tabloda bulunan anahtar kolonlar gerekli")
@@ -41,11 +55,22 @@ def data_diff(before, after, keys: list[str], max_change_ratio=0.0):
     l, r = left.loc[common, columns], right.loc[common, columns]
     equal = l.eq(r) | (l.isna() & r.isna())
     changed = int((~equal.all(axis=1)).sum())
-    added, removed = len(right.index.difference(left.index)), len(left.index.difference(right.index))
+    added_keys, removed_keys = right.index.difference(left.index), left.index.difference(right.index)
+    added, removed = len(added_keys), len(removed_keys)
+    # Datafold tarzı inceleme için: hangi kolonlar değişti, birkaç somut örnek.
+    samples = []
+    for position in np.flatnonzero((~equal.all(axis=1)).to_numpy())[:5]:
+        flags = equal.iloc[position]
+        samples.append({"key": _plain_key(equal.index[position]),
+                        "changes": {c: [_plain(l.iloc[position][c]), _plain(r.iloc[position][c])]
+                                    for c in columns if not flags[c]}})
     ratio = (changed + added + removed) / max(len(left.index.union(right.index)), 1)
     schema_changed = list(before.columns) != list(after.columns) or any(str(before[c].dtype) != str(after[c].dtype) for c in columns.union(pd.Index(keys)))
     return {"added_rows": added, "removed_rows": removed, "changed_rows": changed,
             "changed_cells": int((~equal).sum().sum()), "change_ratio": ratio,
+            "changed_by_column": {c: int((~equal[c]).sum()) for c in columns if not equal[c].all()},
+            "samples": {"changed": samples, "added_keys": [_plain_key(k) for k in added_keys[:5]],
+                        "removed_keys": [_plain_key(k) for k in removed_keys[:5]]},
             "schema_changed": schema_changed, "passed": ratio <= max_change_ratio and not schema_changed,
             "numeric_totals": {c: {"before": float(before[c].sum()), "after": float(after[c].sum())}
                                for c in columns if pd.api.types.is_numeric_dtype(before[c]) and pd.api.types.is_numeric_dtype(after[c])}}

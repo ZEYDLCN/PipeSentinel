@@ -13,7 +13,10 @@ RULE_FIELDS = {
     "not_null": {"max_null_ratio"}, "range": {"min", "max"},
     "uniqueness": set(), "freshness": {"max_lag_minutes"},
     "allowed_values": {"values"}, "referential_integrity": {"reference_values"},
+    "row_count": {"min_rows", "max_rows"}, "column_compare": {"other", "operator"},
 }
+COMPARE_OPERATORS = {"<", "<=", ">", ">=", "==", "!="}
+_NUMERIC = {"integer", "float"}
 
 
 class ContractError(ValueError):
@@ -42,18 +45,37 @@ def validate_contract(value: dict) -> dict:
         if not isinstance(rule, dict) or not isinstance(rule.get("type"), str) or rule.get("type") not in RULE_FIELDS:
             raise ContractError(f"{path}.type: desteklenmeyen kural")
         kind = rule["type"]
-        if not isinstance(rule.get("column"), str) or rule.get("column") not in schema:
+        if kind == "row_count":
+            if "column" in rule:
+                raise ContractError(f"{path}: row_count kuralı kolon almaz")
+        elif not isinstance(rule.get("column"), str) or rule.get("column") not in schema:
             raise ContractError(f"{path}.column: şemada bulunamadı")
         if set(rule) - {"type", "column"} - RULE_FIELDS[kind]:
             raise ContractError(f"{path}: bilinmeyen kural alanı")
         required = {"range": {"min", "max"}, "allowed_values": {"values"},
-                    "referential_integrity": {"reference_values"}}.get(kind, set())
+                    "referential_integrity": {"reference_values"},
+                    "column_compare": {"other", "operator"}}.get(kind, set())
         if required - set(rule):
             raise ContractError(f"{path}: zorunlu alan eksik {sorted(required - set(rule))}")
+        if kind == "row_count":
+            if not {"min_rows", "max_rows"} & set(rule):
+                raise ContractError(f"{path}: min_rows veya max_rows gerekli")
+            for key in ("min_rows", "max_rows"):
+                if key in rule and (type(rule[key]) is not int or rule[key] < 0):
+                    raise ContractError(f"{path}.{key}: negatif olmayan tam sayı olmalı")
+            if rule.get("min_rows", 0) > rule.get("max_rows", float("inf")):
+                raise ContractError(f"{path}: min_rows <= max_rows gerekli")
+        if kind == "column_compare":
+            other = rule["other"]
+            if other not in schema or other == rule["column"] or rule["operator"] not in COMPARE_OPERATORS:
+                raise ContractError(f"{path}: other şemada farklı bir kolon, operator ise {sorted(COMPARE_OPERATORS)} olmalı")
+            left, right = schema[rule["column"]], schema[other]
+            if not (left in _NUMERIC and right in _NUMERIC or left == right == "datetime"):
+                raise ContractError(f"{path}: yalnızca sayısal-sayısal veya datetime-datetime karşılaştırılır")
         for key in ("min", "max", "max_null_ratio", "max_lag_minutes"):
             if key in rule and (type(rule[key]) not in (float, int) or not math.isfinite(rule[key])):
                 raise ContractError(f"{path}.{key}: sonlu sayı olmalı")
-        if kind == "range" and (schema[rule["column"]] not in {"integer", "float"} or rule["min"] > rule["max"]):
+        if kind == "range" and (schema[rule["column"]] not in _NUMERIC or rule["min"] > rule["max"]):
             raise ContractError(f"{path}: sayısal kolon ve min <= max gerekli")
         if not 0 <= rule.get("max_null_ratio", 0) <= 1 or rule.get("max_lag_minutes", 1) <= 0:
             raise ContractError(f"{path}: geçersiz eşik")

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#e9e9dc"><title>Pipeline Sentinel AI · Veri güvenilirliği</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="reliability.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#e9e9dc"><link rel="icon" href="data:,"><title>Pipeline Sentinel AI · Veri güvenilirliği</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="reliability.css"></head>
 <body>
 <div class="workspace">
   <header class="workspace-head">
@@ -10,6 +10,7 @@
   </header>
   <div class="welcome-row"><div><div class="eyebrow"><span class="live-dot"></span> VERİ GÜVENİLİRLİĞİ ÇALIŞMA ALANI</div><h1>Her akış, kontrol altında.</h1><p>Verinizi tanıyın. Değişimi görün. Güvenle ilerleyin.</p></div><div class="welcome-meta"><span id="today-label"></span><span id="session-state">Bağlanıyor…</span></div></div>
   <p id="message" role="status" aria-live="polite"></p>
+  <div id="monitoring-banner" class="banner" role="alert" hidden></div>
   <section id="tab-monitor">
     <div class="overview-strip">
       <div class="quality-breakdown"><div class="strip-title">Analizlerin genel görünümü <span>Son 50 analiz</span></div><div class="quality-labels"><span>Temiz <b id="clean-percent">—</b></span><span>İncelenmeli <b id="issue-percent">—</b></span><span>Baseline <b id="baseline-count">—</b></span></div><div class="quality-track" aria-label="Analiz dağılımı"><span id="clean-track" class="track-clean"></span><span id="issue-track" class="track-issue"></span><span class="track-pattern"></span></div></div>
@@ -32,6 +33,7 @@
   </section>
   <section id="tab-sources" hidden><div class="panel"><h2>Bağlı kaynaklar</h2><div id="sources"></div></div><form id="source-form" class="panel"><h2>Kaynak ekle / güncelle</h2><p>Aynı adla kaydetmek mevcut kaynağı günceller. Bağlantı şifresi sunucudaki ortam değişkeninde tutulur.</p><div class="form-grid">
     <label>Kaynak adı<input name="name" required maxlength="160" placeholder="Siparişler"></label>
+    <label>Kaynak türü<select name="type"><option value="postgresql">PostgreSQL</option><option value="duckdb">DuckDB (dosya yolu değişkeni)</option></select></label>
     <label>Bağlantı değişkeni<input name="connection_env" required value="SENTINEL_SOURCE_COMMERCE"></label>
     <label>Şema<input name="schema" required value="public"></label><label>Tablo<input name="table" required value="orders"></label>
     <label>En fazla incelenecek satır<input name="max_rows" type="number" min="1" max="100000" value="10000" required></label>
@@ -40,10 +42,14 @@
     <label>Segment kolonları<input name="segment_by" placeholder="Örn. currency,country"></label>
     <label>Hassas kolonlar<input name="sensitive_columns" placeholder="Örn. email"></label>
     <label>Lineage varlığı<input name="lineage_asset" placeholder="model.commerce.orders"></label>
+    <label>Öğrenilmiş tazelik kolonları<input name="learned_freshness" placeholder="Örn. created_at (SLA gerekmez)"></label>
+    <label>Otomatik analiz aralığı (dakika)<input name="schedule_minutes" type="number" min="5" max="10080" placeholder="Boş bırakırsanız elle başlatılır"></label>
     <label>Partition kolonu<input name="partition_column" placeholder="İsteğe bağlı"></label>
     <label>Partition başlangıcı<input name="partition_start" placeholder="Dahil"></label><label>Partition bitişi<input name="partition_end" placeholder="Hariç"></label>
     <label class="checkbox"><input name="seasonal" type="checkbox"> Haftanın günü ve saatine göre karşılaştır</label>
     <label class="checkbox"><input name="retain_snapshot" type="checkbox"> Onarım denemesi için veri kopyasını sakla</label>
+    <label class="checkbox"><input name="multivariate" type="checkbox"> Kolonların ortak dağılımını da izle (veri kopyası saklamayı gerektirir)</label>
+    <label class="checkbox"><input name="auto_baseline" type="checkbox"> Sinyalsiz analizleri otomatik referans yap (siz ilk referansı onayladıktan sonra)</label>
   </div><label>Veri sözleşmesi (YAML)<textarea name="contract" rows="15" spellcheck="false" required>version: 1
 expected_schema:
   order_id: integer
@@ -55,7 +61,7 @@ rules:
   - type: range
     column: total_amount
     min: 0
-    max: 1000</textarea></label><div class="toolbar"><button type="button" id="validate-contract" class="btn secondary">Sözleşmeyi doğrula</button><button class="btn">Kaydet</button></div></form></section>
+    max: 1000</textarea></label><div class="toolbar"><label>Sözleşme yazmak istemiyor musunuz? CSV örneğinden taslak çıkarın<input id="suggest-csv" type="file" accept=".csv"></label><button type="button" id="suggest-contract" class="btn secondary">Taslak öner</button><button type="button" id="validate-contract" class="btn secondary">Sözleşmeyi doğrula</button><button class="btn">Kaydet</button></div></form></section>
   <section id="tab-lineage" hidden><div class="panel"><h2>Gerçek bağımlılıklar</h2><p>Bağlantılar olası etkiyi gösterir; veri bozulduğunun kanıtı değildir.</p><div id="graphs"></div></div><form id="ingest-form" class="panel"><h2>Bağımlılıkları içeri al</h2><div class="form-grid"><label>Proje / namespace<input name="namespace" required value="commerce"></label><label>Tür<select name="kind"><option value="dbt">dbt manifest</option><option value="openlineage">OpenLineage olayı</option></select></label><label>JSON dosyası<input name="artifact" type="file" accept=".json" required></label><label>dbt run_results (isteğe bağlı)<input name="results" type="file" accept=".json"></label></div><button class="btn">İçeri al</button></form></section>
   <section id="tab-policies" hidden><div class="panel"><h2>Varlık sahipleri ve kritik raporlar</h2><div id="policies"></div></div><form id="policy-form" class="panel"><h2>İş etkisi tanımı</h2><div class="form-grid"><label>Varlık kimliği<input name="asset" required placeholder="exposure.commerce.finance"></label><label>Sahibi<input name="owner" required placeholder="Finans ekibi"></label><label>Kritiklik (1–5)<input name="criticality" type="number" min="1" max="5" value="3" required></label><label>SLA (dakika)<input name="sla_minutes" type="number" min="1" value="60" required></label></div><button class="btn">Kaydet</button></form></section>
   <section id="tab-notifications" hidden><div class="panel"><h2>Bildirim kutusu</h2><p>Olaylar burada saklanır. Webhook teslimi yapılandırılmış işleyicide açılır.</p><div id="notifications"></div></div></section>
