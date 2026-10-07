@@ -8,6 +8,7 @@
   "order_by": ["order_id"],
   "segment_by": ["batch"],
   "retain_snapshot": true,
+  "schedule_minutes": 60,
   "lineage_asset": "model.commerce.orders",
   "contract": {
     "version": 1,

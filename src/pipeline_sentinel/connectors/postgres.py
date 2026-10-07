@@ -19,11 +19,18 @@ def identifier(value):
     return '"' + value.replace('"', '""') + '"'
 
 
+CONNECTOR_TYPES = ("postgresql", "duckdb")
+
+
 def validate_source(config: dict) -> dict:
+    """Bütün connector türleri için ortak kaynak doğrulaması (`type` yoksa postgresql)."""
     allowed = {"connection_env", "schema", "table", "allowlist", "max_rows", "timeout_seconds",
-               "contract", "partition", "order_by", "segment_by", "seasonal", "retain_snapshot", "sensitive_columns", "lineage_asset"}
+               "contract", "partition", "order_by", "segment_by", "seasonal", "retain_snapshot", "sensitive_columns", "lineage_asset",
+               "schedule_minutes", "auto_baseline", "learned_freshness", "type", "adaptive_detection", "multivariate"}
     if not isinstance(config, dict) or set(config) - allowed:
         raise ValueError("Kaynak yapılandırmasında bilinmeyen alan")
+    if config.get("type", "postgresql") not in CONNECTOR_TYPES:
+        raise ValueError("type: " + " veya ".join(CONNECTOR_TYPES))
     result = {"schema": "public", "max_rows": 10000, "timeout_seconds": 30,
               "order_by": [], "segment_by": [], "sensitive_columns": [], "seasonal": False,
               "retain_snapshot": False, **config}
@@ -48,6 +55,18 @@ def validate_source(config: dict) -> dict:
     for key in ("seasonal", "retain_snapshot"):
         if type(result[key]) is not bool:
             raise ValueError(f"{key}: boolean gerekli")
+    schedule = result.get("schedule_minutes")
+    if schedule is not None and (type(schedule) is not int or not 5 <= schedule <= 10080):
+        raise ValueError("schedule_minutes: 5–10080 arası tam sayı gerekli")
+    for key in ("auto_baseline", "adaptive_detection", "multivariate"):
+        if type(result.get(key, False)) is not bool:
+            raise ValueError(f"{key}: boolean gerekli")
+    if result.get("multivariate") and not result["retain_snapshot"]:
+        raise ValueError("multivariate için retain_snapshot açık olmalı (referans veri kopyası gerekir)")
+    learned = result.get("learned_freshness", [])
+    if (not isinstance(learned, list) or len(learned) > 10
+            or any(col not in schema or schema[col] != "datetime" for col in learned)):
+        raise ValueError("learned_freshness: sözleşmedeki datetime kolonlarından oluşan en fazla 10 kolon")
     if result["sensitive_columns"] and result["retain_snapshot"]:
         raise ValueError("Hassas kolon içeren kaynakta snapshot saklama kapalı olmalı")
     part = result.get("partition")

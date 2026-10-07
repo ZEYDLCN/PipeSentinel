@@ -1,6 +1,7 @@
 """dbt artifacts and OpenLineage RunEvents normalized into explicit graphs."""
 from __future__ import annotations
 
+from . import column_lineage
 from .contract_io import digest
 
 
@@ -41,9 +42,15 @@ def dbt_graph(manifest: dict, results: dict | None = None) -> dict:
                 raise ValueError("run_results ile manifest aynı projeye ait olmalı")
             runs.append({"asset": uid, "status": result.get("status"), "execution_time": result.get("execution_time"),
                          "timing": result.get("timing", [])})
+    column_edges, column_stats = [], None
+    if column_lineage.available() and any(isinstance(n, dict) and (n.get("compiled_code") or n.get("compiled_sql"))
+                                          for n in nodes.values()):
+        column_edges, column_stats = column_lineage.dbt_column_edges(nodes, manifest["metadata"].get("adapter_type"))
+    coverage = ("dataset dependencies; column lineage inferred best-effort from compiled SQL"
+                if column_stats else "dataset dependencies; no column lineage (needs compiled SQL and the sqlglot extra)")
     return {"nodes": normalized, "edges": sorted(edges), "runs": runs,
             "generated_at": manifest["metadata"].get("generated_at"), "hash": digest(manifest),
-            "coverage": "dataset dependencies; column lineage is not inferred from SQL"}
+            "column_edges": column_edges, "column_stats": column_stats, "coverage": coverage}
 
 
 def openlineage_graph(event: dict) -> dict:
@@ -66,10 +73,45 @@ def openlineage_graph(event: dict) -> dict:
             uid = key(dataset)
             nodes[uid] = {"name": dataset["name"], "type": "dataset"}
             edges.append([uid, job_key] if direction == "inputs" else [job_key, uid])
-    # Job-mediated reachability is potential impact, not invented column derivation.
+    # Kolon bağlantıları yalnızca olayın standart `columnLineage` facet'inde açıkça bildirilmişse alınır;
+    # SQL'den veya job giriş/çıkışlarından kolon türetimi uydurulmaz.
+    column_edges = []
+    for dataset in event.get("outputs", []):
+        fields = ((dataset.get("facets") or {}).get("columnLineage") or {}).get("fields") or {}
+        if not isinstance(fields, dict) or len(fields) > 2000:
+            raise ValueError("OpenLineage columnLineage.fields sınırlı bir nesne olmalı")
+        for out_column, spec in fields.items():
+            inputs = (spec or {}).get("inputFields", []) if isinstance(spec, dict) else []
+            if not isinstance(inputs, list) or len(inputs) > 200:
+                raise ValueError("OpenLineage inputFields sınırlı liste olmalı")
+            for source in inputs:
+                if not isinstance(source.get("field") if isinstance(source, dict) else None, str) or not source["field"]:
+                    raise ValueError("OpenLineage inputFields.field gerekli")
+                column_edges.append([key(source), source["field"].lower(), key(dataset), str(out_column).lower()])
     return {"nodes": nodes, "edges": edges, "runs": [{"asset": job_key, "run_id": event["run"]["runId"],
              "status": event["eventType"], "event_time": event["eventTime"]}], "hash": digest(event),
-            "coverage": "job input/output reachability; potential impact only"}
+            "column_edges": column_edges, "column_stats": None,
+            "coverage": "job input/output reachability; potential impact only"
+                        + ("; column lineage from the columnLineage facet" if column_edges else "")}
+
+
+def reachable_columns(column_edges: list, asset: str, column: str, reverse=False, limit=200) -> list[tuple[str, str]]:
+    """(varlık, kolon) çiftleri üzerinde yön izleyen BFS; başlangıç hariç, en fazla `limit` sonuç."""
+    adjacency = {}
+    for source_asset, source_column, target_asset, target_column in column_edges:
+        left, right = (source_asset, source_column), (target_asset, target_column)
+        if reverse:
+            left, right = right, left
+        adjacency.setdefault(left, set()).add(right)
+    start = (asset, column.lower())
+    seen, queue, found = {start}, [start], []
+    while queue and len(found) < limit:
+        for node in sorted(adjacency.get(queue.pop(0), ())):
+            if node not in seen:
+                seen.add(node)
+                queue.append(node)
+                found.append(node)
+    return found[:limit]
 
 
 def reachable(edges: list, start: str, reverse=False) -> set[str]:

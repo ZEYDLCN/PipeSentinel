@@ -110,6 +110,18 @@ def _actions_for_rule(rule_id: str, column: str | None) -> list[dict[str, Any]]:
         "cardinality_drift": [
             {"type": "dbt_test", "description": f"{col} kardinalite değişimini izlemeye al (bilgilendirici)", "requires_approval": False},
         ],
+        "joint_distribution_shift": [
+            {"type": "dbt_test", "description": "Birbiriyle ilişkili kolonlar için ilişki/oran testi ekle; son dönüşüm veya join değişikliğini incele", "requires_approval": False},
+        ],
+        "stale_data": [
+            {"type": "alert", "description": f"{col} için yükleme işinin son çalışmasını ve kaynak sistem durumunu kontrol et", "requires_approval": False},
+        ],
+        "row_count_bound": [
+            {"type": "alert", "description": "Yükleme işinin kaynağını ve filtrelerini kontrol et; sözleşmedeki satır sınırını gözden geçir", "requires_approval": False},
+        ],
+        "column_relation_broken": [
+            {"type": "dbt_test", "description": f"{col} için kolonlar arası ilişki testi ekle/doğrula", "requires_approval": False},
+        ],
     }
     return templates.get(rule_id, [])
 
@@ -254,6 +266,24 @@ def _column_hypotheses(
         )
         consumed.add(freshness["id"])
 
+    stale = _find(signals, "staleness")
+    if stale:
+        evidence = stale["evidence"]
+        hyps.append(
+            Hypothesis(
+                hypothesis=(
+                    f"'{column}' verisi öğrenilen olağan düzenden geç geliyor "
+                    f"({evidence.get('lag_minutes', '?')} dk; olağan {evidence.get('typical_lag_minutes', '?')} dk): "
+                    f"upstream yükleme durmuş, takılmış ya da kaynak sistemde kesinti olabilir."
+                ),
+                confidence=stale["score"],
+                evidence_ids=[stale["id"]],
+                rule_id="stale_data",
+                column=column,
+            )
+        )
+        consumed.add(stale["id"])
+
     semantic = _find(signals, "semantic_drift")
     if semantic and semantic["id"] not in consumed:
         hyps.append(
@@ -269,6 +299,24 @@ def _column_hypotheses(
             )
         )
         consumed.add(semantic["id"])
+
+    relation = _find(signals, "column_compare")
+    if relation:
+        other = relation["evidence"].get("other", "diğer kolon")
+        hyps.append(
+            Hypothesis(
+                hypothesis=(
+                    f"'{column}' ile '{other}' arasındaki sözleşme ilişkisi bozuldu "
+                    f"({relation['evidence'].get('violation_count', '?')} satır): kolonlardan biri "
+                    f"yanlış doldurulmuş, birimleri/saat dilimleri farklılaşmış ya da sıra karışmış olabilir."
+                ),
+                confidence=relation["score"],
+                evidence_ids=[relation["id"]],
+                rule_id="column_relation_broken",
+                column=column,
+            )
+        )
+        consumed.add(relation["id"])
 
     cardinality = _find(signals, "cardinality_drift")
     if cardinality and cardinality["id"] not in consumed:
@@ -290,9 +338,39 @@ def _dataset_level_hypotheses(signals_by_column: dict[str | None, list[dict[str,
     """`volume` sinyali dataset seviyesindedir (column=None); `uniqueness`
     genelde bir PK kolonundadır. İkisi birlikteyse duplicate-load hipotezi
     diğer tüm per-column kurallardan önceliklidir."""
+    bound = _find(signals_by_column.get(None, []), "row_count")
+    bound_hypotheses = [
+        Hypothesis(
+            hypothesis=(
+                "Satır sayısı sözleşmedeki sınırın dışında: kaynak eksik/boş yüklenmiş, "
+                "filtre değişmiş ya da hacim beklenmedik biçimde değişmiş olabilir."
+            ),
+            confidence=bound["score"],
+            evidence_ids=[bound["id"]],
+            rule_id="row_count_bound",
+            column=None,
+        )
+    ] if bound else []
+
+    joint = _find(signals_by_column.get(None, []), "multivariate_drift")
+    if joint:
+        bound_hypotheses.append(
+            Hypothesis(
+                hypothesis=(
+                    f"Kolonların birlikte dağılımı baseline'dan saptı (satırların %{joint['evidence'].get('outlier_rate', 0) * 100:.1f}'i "
+                    f"alışılmadık); tek tek kolonlar normal görünse bile aralarındaki ilişkiyi değiştiren bir join, "
+                    f"dönüşüm ya da kaynak değişikliği olabilir (insan doğrulaması önerilir)."
+                ),
+                confidence=joint["score"] * 0.8,
+                evidence_ids=[joint["id"]],
+                rule_id="joint_distribution_shift",
+                column=None,
+            )
+        )
+
     volume = _find(signals_by_column.get(None, []), "volume")
     if not volume:
-        return []
+        return bound_hypotheses
 
     uniqueness = None
     for col, sigs in signals_by_column.items():
@@ -305,7 +383,7 @@ def _dataset_level_hypotheses(signals_by_column: dict[str | None, list[dict[str,
 
     if uniqueness:
         confidence = min(0.99, (volume["score"] + uniqueness["score"]) / 2 + 0.1)
-        return [
+        return bound_hypotheses + [
             Hypothesis(
                 hypothesis=(
                     "Kayıtlar muhtemelen birden fazla kez yüklendi (duplicate load / "
@@ -318,7 +396,7 @@ def _dataset_level_hypotheses(signals_by_column: dict[str | None, list[dict[str,
             )
         ]
 
-    return [
+    return bound_hypotheses + [
         Hypothesis(
             hypothesis=(
                 "Kaynak veri hacminde beklenmeyen bir değişiklik var (upstream veri kaybı/"

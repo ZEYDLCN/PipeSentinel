@@ -75,6 +75,51 @@ def test_live_source_baseline_fault_sandbox_and_approval(source_setup):
         assert conn.execute(text(f'SELECT sum(amount) FROM "{config["schema"]}".orders')).scalar() == 50100
 
 
+def test_live_schedule_expected_change_and_snapshot_table(source_setup):
+    from datetime import datetime, timedelta, timezone
+    engine, config = source_setup
+    schema = config["schema"]
+    with engine.begin() as conn:
+        conn.execute(text(f'DELETE FROM "{schema}".orders'))
+        conn.execute(text(f"INSERT INTO \"{schema}\".orders SELECT g, 'good', 100 + (g * 37) % 200 FROM generate_series(1, 300) g"))
+    with engine.begin() as conn:  # paylaşılan test metadata'sında önceki koşulardan kalan zamanlanmış kaynak/iş olmasın
+        conn.execute(store.jobs.delete().where(store.jobs.c.status == "pending"))
+        for other in store.rows(conn, store.sources, limit=1000):
+            if other["config"].get("schedule_minutes"):
+                conn.execute(store.sources.delete().where(store.sources.c.id == other["id"]))
+    source = svc.register_source(engine, schema, {**config, "max_rows": 1000, "schedule_minutes": 5}, "test")
+    start = datetime(2026, 10, 7, 9, 0, tzinfo=timezone.utc)
+    try:
+        _scheduled_flow(engine, source, schema, start)
+    finally:
+        with engine.begin() as conn:  # zamanlanmış kaynak ve kalan işler, silinecek şemayı işaret etmesin
+            conn.execute(store.jobs.delete().where(store.jobs.c.status == "pending"))
+            conn.execute(store.sources.delete().where(store.sources.c.id == source["id"]))
+
+
+def _scheduled_flow(engine, source, schema, start):
+    from datetime import timedelta
+    assert len(svc.enqueue_due(engine, start)) == 1
+    first = svc.work_once(engine)
+    assert first["quality"] == "candidate" and first["body"]["snapshot_available"]
+    with engine.connect() as conn:
+        assert len(store.rows(conn, store.snapshots, store.snapshots.c.observation_id == first["id"])) == 1
+    svc.accept_baseline(engine, first["id"], "test")
+
+    with engine.begin() as conn:
+        conn.execute(text(f'UPDATE "{schema}".orders SET amount = amount * 1.3'))
+    assert len(svc.enqueue_due(engine, start + timedelta(minutes=10))) == 1
+    shifted = svc.work_once(engine)
+    assert [s["type"] for s in shifted["body"]["signals"]] == ["distribution"]
+    assert shifted["body"]["signals"][0]["evidence"]["method"] == "standard_error"
+
+    svc.accept_expected_change(engine, shifted["id"], "Fiyat listesi %30 güncellendi", "reviewer")
+    assert len(svc.enqueue_due(engine, start + timedelta(minutes=20))) == 1
+    after = svc.work_once(engine)
+    assert after["body"]["signals"] == [] and after["body"]["baseline"]["ids"] == [shifted["id"]]
+    assert source["id"] == after["source_id"]
+
+
 def test_connector_enforces_read_only_even_with_privileged_source(source_setup):
     engine, config = source_setup
     schema = config["schema"]

@@ -43,6 +43,139 @@ idempotent oluşturur. Bu tablolar, eski demo `reset` işleminden bağımsızdı
 `metadata.create_all` bu ilk şemayı kurar; gelecekteki kolon değişiklikleri
 için ayrıca sürümlü ALTER migration'ları gerekir.
 
+## Sürekli izleme: zamanlama, referans ve taslak sözleşme
+
+**Zamanlama.** Kaynak yapılandırmasına `"schedule_minutes": 60` (5–10080 dakika)
+ekleyin veya dashboard'daki "Otomatik analiz aralığı" alanını doldurun.
+`reliability worker` 30 saniyede bir vadesi gelen kaynakları kuyruğa alır
+(`--no-schedule` ile kapanır). Anahtar zaman dilimine bağlıdır; birden fazla worker
+aynı dilim için tek iş üretir. Kaynak için bitmemiş bir iş varsa yenisi eklenmez,
+yavaş kaynaklarda işler birikmez. Zamanlamayı değiştirmek geçmiş referansı sıfırlamaz.
+Worker durursa analizler de durur; worker'ı bir servis olarak çalıştırın.
+
+**Taslak sözleşme.** Elle YAML yazmak yerine bir CSV örneğinden başlayın:
+
+```powershell
+.\.venv\Scripts\sentinel.exe reliability suggest-contract ornek.csv --output contract.yml
+```
+
+Dashboard'da kaynak formunda CSV'yi seçip "Taslak öner" düğmesine basmak aynı şeyi
+yapar. Çıktı tür, `not_null` (anahtar kolonlarda sıfır boşluk), anahtar benzeri
+kolonlar için `uniqueness`, sayısal kolonlar için payı olan `range` ve az değerli
+metin kolonları için `allowed_values` önerir. Zaman kolonları için SLA tahmin
+edilmez, başlıktaki `# NOT:` satırlarında hatırlatılır. Eşikler örneğe göre
+seçilir; kaydetmeden önce gözden geçirin. Örnek 100000 satırla sınırlıdır.
+
+**Yeni sözleşme kuralları.**
+
+```yaml
+rules:
+  - {type: row_count, min_rows: 1000}                              # kolon almaz
+  - {type: column_compare, column: net, operator: "<=", other: gross}  # sayısal/datetime
+```
+
+`column_compare` boş değerleri atlar. Tipler uyuşmuyorsa ilişki yerine şema ihlali
+raporlanır.
+
+**Otomatik referans (isteğe bağlı).** `"auto_baseline": true` ile sinyalsiz bir analiz
+otomatik olarak referans olur; yalnızca daha önce bir insan referansı kabul
+etmişse (`baseline.state == ready`) çalışır ve denetim kaydına `auto-baseline`
+aktörüyle yazılır. Büyüyen tablolarda eski hacimle kıyaslamayı önler, ama yavaş
+kaymayı normalleştirebilir; hassas kaynaklarda kapalı tutun.
+
+**Beklenen değişim.** Kampanya, yeni pazar veya fiyat değişimi gibi gerçek bir iş
+değişimi sonrası alarm sürerse analiz detayından "Beklenen değişim olarak kabul et"
+düğmesini kullanın (en az 10 karakterlik gerekçe zorunlu):
+
+```powershell
+.\.venv\Scripts\sentinel.exe reliability expected-change <observation-id> --note "Kasım kampanyası fiyatları yükseltti" --actor ayse
+```
+
+Yalnızca geçmişle karşılaştırmadan doğan sinyaller (dağılım, hacim, segment,
+kardinalite) için ve kaynağın **en son** analizinde mümkündür. Sözleşme ihlali
+içeren analiz referans olamaz; sözleşmeyi güncelleyin. Karar, gerekçesiyle denetim
+kaydına ve geri bildirime yazılır.
+
+**Tespit.** Dağılım kontrolü artık ortalama farkını standart hataya (Welch) göre de
+sınar: |z| ≥ 6 ve baseline'a göre ≥ %10 kayma gerekir. Böylece büyük örneklemde
+satır bazlı stddev'in gizlediği orta büyüklükteki kaymalar yakalanır, çok büyük
+örneklemde önemsiz kaymalar alarm vermez. Örnek 30'dan küçükse devreye girmez.
+
+**Değişiklik adayları.** Sinyalli bir analizde, son bilinen iyi referanstan beri
+varlığı veya yukarı akışını etkileyen dbt tanım değişiklikleri ve başarısız
+çalıştırmalar listelenir. İlk içe aktarma değişiklik sayılmaz. Bu liste zamansal
+örtüşmedir, nedensellik kanıtı değildir; RCA raporunu ve `replay` sonucunu etkilemez.
+
+**Olay yönetimi ve susturma.** Sinyalli bir analizde "Olay durumu" ile durumu (açık,
+üstlenildi, çözüldü), sorumluyu ve notu kaydedin; liste "Durum" sütununda gösterir.
+Aynı alarm tekrar ediyorsa "Alarmı sustur" ile belirli bir sinyali (tür + kolon) 24,
+72 veya 168 saat susturun (gerekçe en az 5 karakter). Susturma yalnızca bildirimi
+bastırır: analiz, sinyaller ve kanıtlar kaydedilir, analiz "susturulmuş alarm"
+olarak işaretlenir. Analizdeki **her** sinyal susturulmuş değilse bildirim yine gider.
+API: `POST /observations/{id}/triage`, `GET/POST /mutes`, `DELETE /mutes/{id}`.
+
+**Metrik geçmişi.** Analiz detayında satır sayısı ile sayısal kolonların ortalama ve boş
+oranı, aynı yapılandırmadaki son 60 analiz üzerinden çizilir (`GET /sources/{id}/history`).
+Kırmızı nokta sinyalli analizi, halka açık olan analizi gösterir.
+
+**Öğrenilmiş tazelik (SLA gerektirmez).** Kaynak yapılandırmasına
+`"learned_freshness": ["created_at"]` ekleyin (sözleşmedeki `datetime` kolonları, en
+fazla 10). En az 5 kabul edilmiş analizden "analiz anı − en yeni değer" gecikmesinin
+medyanı ve MAD'ı öğrenilir; gecikme `max(medyan + 6σ, 2 × medyan, medyan + 15 dk)`
+eşiğini aşarsa `staleness` sinyali üretilir. Geçmiş yoksa sinyal üretilmez. Kesin bir
+SLA'nız varsa `freshness` kuralını kullanın.
+
+**PR veri özeti.** `ci-check` komutuna `--markdown reports/data-quality.md` verirseniz
+kolon bazında değişim, sayısal toplam farkları, ihlaller ve en fazla 5 örnek satır
+okunabilir bir özet olarak yazılır; `data-quality.yml` bu özeti GitHub step summary'ye
+ekler. Örnek satırlar CSV'lerinizdeki gerçek değerleri içerir; hassas veri taşıyan
+dosyalar için raporu paylaşırken dikkatli olun.
+
+## İzleme sağlığı, gelişmiş tespit ve kolon lineage
+
+**İzleme sağlığı.** Worker her ~10 saniyede kalp atışı yazar. `GET /api/v1/reliability/monitoring`
+ve `sentinel reliability status` şunu raporlar: worker canlı mı (`SENTINEL_WORKER_TTL_SECONDS`,
+varsayılan 90 sn), kuyrukta bekleyen/çalışan iş, her kaynak için son başarılı analiz.
+`schedule_minutes` tanımlı bir kaynak `2 × aralık + 10 dakika` içinde başarılı analiz üretmezse
+"gecikmiş" sayılır (kaynak veritabanına ulaşılamadığı için analizler başarısız oluyorsa da). Durum:
+`ok`, `degraded` (gecikmiş kaynak veya 15 dakikadan eski bekleyen iş), `down` (iş var ama canlı
+worker yok). `status` komutu çıkış kodu verir (0/1/2; `--fail-on down` ile yalnızca `down`
+başarısız sayılır), yani cron veya uptime kontrolüne bağlanabilir. Worker çökerse webhook da
+gönderilemez; bu yüzden dışarıdan izleyin. Dashboard'da durum `ok` değilse üstte bir banner çıkar.
+
+**Geçmişten öğrenen eşikler.** En az 8 kabul edilmiş analiz biriktiğinde hacim, kolon ortalaması
+ve boş oranı için olağan aralık (medyan ve MAD) öğrenilir; |z| ≥ 6 ve pratik anlamlılık (ortalama
+ve hacimde ≥ %5, boş oranında ≥ 2 puan) gerekir. Kararlı bir tabloda sabit %30 hacim eşiğinin
+kaçırdığı ~%12'lik düşüşü yakalar. Kapatmak için `"adaptive_detection": false`. Mevsimsel
+kaynaklarda yalnızca aynı hafta günü ve saatindeki analizler (en az 5) kullanılır.
+
+**Çok değişkenli tespit (isteğe bağlı).** `"multivariate": true` (ve `retain_snapshot`) ile her
+analiz, en yeni kabul edilmiş analizin veri kopyasına göre kolonların *birlikte* dağılımını
+karşılaştırır. Mahalanobis mesafesi doğrusal ilişkilerin bozulmasını (ör. ücret ≈ 0,1 × tutar
+artık geçerli değil; kolonların tek tek ortalaması aynı kalsa bile), Isolation Forest küresel
+aykırılıkları (ör. yeni bir küme) yakalar. Isolation Forest için `pip install -e ".[ml]"`; yoksa
+yalnızca Mahalanobis çalışır. Satırların ≥ %3'ü referansta alışılmadık ve p < 1e-6 ise
+`multivariate_drift` sinyali üretilir. En az iki sayısal, kimlik olmayan kolon ve 200 satır gerekir.
+
+**DuckDB connector.** `"type": "duckdb"`, `connection_env` bir `.duckdb` dosyasının yolunu içeren
+ortam değişkeni (`SENTINEL_SOURCE_...`), `schema` genellikle `main`. Dosya `read_only=True` açılır,
+tablo allowlist'te olmalıdır, sorgu `timeout_seconds` sonunda kesilir. `pip install -e ".[duckdb]"`.
+Parquet/CSV dosyalarını izlemek için DuckDB içinde bir görünüm (view) tanımlayın. Dashboard'da
+"Kaynak türü" alanından seçilir.
+
+**Yeni connector eklemek.** `scan(config) -> ScanResult` sağlayan bir sınıf yazın,
+`connectors/postgres.py::CONNECTOR_TYPES` listesine türü ekleyin ve `connectors/__init__.py::get_connector`'a
+bağlayın. Salt okunur erişimi sunucu tarafında zorlayın (rol, oturum ayarı); Snowflake/BigQuery bu
+repoda yoktur, çünkü hesapsız doğrulanamaz.
+
+**Kolon lineage.** `ingest-dbt` komutu (veya dashboard'da dbt manifest yükleme), manifest'te
+`compiled_code` varsa (`dbt compile/run` sonrası) her modelin çıktı kolonlarını yukarı akış
+kolonlarına bağlar (join, alias, CTE ve belgelenmiş kolonlarla `select *` desteklenir). OpenLineage
+olaylarında standart `columnLineage` facet'i okunur. `pip install -e ".[lineage]"` gerekir. Sinyalli
+bir kolon için analiz detayında "Kolon etkisi" yukarı ve aşağı akış kolonlarını gösterir; bağımlılık
+uydurulmaz, çözülemeyenler `column_stats`'ta sayılır. Dashboard'daki Bağımlılıklar sekmesi kolon
+bağlantılarını listeler.
+
 ## Pilot erişimi
 
 ```powershell
@@ -179,6 +312,10 @@ durumlar görünür. İsteğe bağlı webhook için worker ortamında
 `SENTINEL_WEBHOOK_URL` (HTTPS) ve `SENTINEL_WEBHOOK_SECRET` (en az 24 karakter)
 tanımlayıp `reliability worker --notifications` kullanın.
 
+`SENTINEL_WEBHOOK_FORMAT=slack` Slack/Mattermost uyumlu `{"text": …}` gövdesi
+gönderir (varsayılan `json`). Bu biçimde de imza başlığı eklenir; Slack onu
+doğrulamaz, kendi webhook adresinizin gizliliğine güvenir.
+
 Payload ham satır veya örnek değer içermez. `X-Sentinel-Signature`, payload'ın
 HMAC-SHA256 imzasıdır. `X-Sentinel-Event` sabit olay kimliğidir; alıcı bu kimlikle
 tekrar teslimleri ayıklamalıdır. Teslim 10 saniye timeout, en fazla üç deneme ve
@@ -221,6 +358,29 @@ Etiketli veri olmadan accuracy/recall hesaplanmaz. F01–F06 eval başarısı ya
 bu altı sentetik senaryo için geçerlidir. Yeni testler gerçek kaynak, kalite
 referansı, mevsimsellik, segment kaybı, audit/roller, timeout/tekrar deneme,
 yanlış onarım ve güncelliğini yitirmiş onay durumlarını da kapsar.
+
+7 Ekim 2026 yerel doğrulaması (sürekli izleme turları): 189 birim testi ve yalıtılmış
+bir PostgreSQL 15 kümesinde 35 entegrasyon testi geçti; F01–F06 eval senaryolarının
+tamamı geçti. Dashboard, gerçek tarayıcıda (Edge ve Chrome) Playwright ile uçtan uca
+test edildi: CSV'den taslak sözleşme, zamanlayıcının kendiliğinden analizi, baseline
+kabulü, dbt manifest'ten kolon bağlantıları, veri kayması ve "Kolon etkisi", olay durumu,
+susturma, metrik grafikleri, beklenen değişim, DuckDB kaynağı ekleme, worker durunca "İzleme
+durdu" banner'ı, pilot modunda rol denetimi ve dar ekran. Ayrıntılı gerekçe ve rakip karşılaştırması:
+[`product-review-tr.md`](product-review-tr.md).
+
+Tarayıcı testini kendiniz çalıştırmak için boş, ayrı bir PostgreSQL veritabanı gerekir
+(test her koşuda `sentinel_*` tablolarını siler):
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[e2e]"
+.\.venv\Scripts\python.exe tests/e2e/dashboard_flow.py --db-url postgresql+psycopg://kullanici@127.0.0.1:5432/sentinel_e2e --out reports/e2e --browser msedge
+```
+
+`--browser` değeri `msedge`, `chrome` veya `chromium` olabilir; ekran görüntüleri `--out`
+klasörüne yazılır.
+
+`sentinel migrate`, veri kopyalarını `sentinel_snapshots` tablosunda tutar. Önceki
+sürümde gövdede saklanan kopyalar okunmaya devam eder.
 
 ## Protokol kaynakları
 

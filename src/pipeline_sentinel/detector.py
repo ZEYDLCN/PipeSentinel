@@ -8,6 +8,7 @@ yakalamak tasarım ilkesidir (bkz. doküman başlığı "Tasarım ilkesi").
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -65,6 +66,7 @@ _VIOLATION_SCORE: dict[str, float] = {
     "uniqueness": 0.9,
     "referential_integrity": 0.85,
     "semantic_drift": 0.5,
+    "row_count": 0.75,
 }
 
 
@@ -78,7 +80,7 @@ def _score_for_violation(v: Violation) -> float:
         excess = max(0.0, null_ratio - max_allowed)
         return min(1.0, 0.5 + excess * 2.0)
 
-    if v.rule_type == "range":
+    if v.rule_type in {"range", "column_compare"}:
         ratio = v.evidence.get("violation_ratio", 0.0)
         return min(1.0, 0.4 + ratio * 3.0)
 
@@ -171,6 +173,45 @@ def compare_column_profiles(
                     source="baseline",
                 )
             )
+
+    # Satır bazlı stddev'e göre z-skoru yalnızca kaba kaymaları (ör. ×100) yakalar:
+    # N büyüdükçe ortalamanın belirsizliği stddev/√N'e düşer. Her iki profil de
+    # satır sayısı taşıyorsa, ortalama farkı standart hataya (Welch) göre de
+    # sınanır; bunun için hem istatistiksel (|z|>=6) hem pratik (>=%10) anlamlılık
+    # gerekir, böylece çok büyük örneklemlerde önemsiz kaymalar alarm üretmez.
+    if (not is_identifier and not any(s.type == "distribution" for s in signals)
+            and "mean" in baseline and "mean" in current):
+        n_b = baseline.get("row_count", 0) * (1 - baseline.get("null_ratio", 0.0))
+        n_c = current.get("row_count", 0) * (1 - current.get("null_ratio", 0.0))
+        if n_b >= 30 and n_c >= 30:
+            diff = current["mean"] - baseline["mean"]
+            se = math.sqrt(baseline.get("stddev", 0.0) ** 2 / n_b + current.get("stddev", 0.0) ** 2 / n_c)
+            z_se = diff / se if se > 1e-12 else math.copysign(1e6, diff)
+            scale = max(abs(baseline["mean"]), baseline.get("stddev", 0.0), 1e-9)
+            shift = abs(diff) / scale
+            if abs(z_se) >= 6.0 and shift >= 0.10:
+                score = min(1.0, 0.45 + shift * 0.5)
+                signals.append(
+                    AnomalySignal(
+                        type="distribution",
+                        column=column,
+                        severity=severity_from_score(score),
+                        score=score,
+                        evidence={
+                            "message": (
+                                f"{column} ortalaması baseline {baseline['mean']:.4g} -> "
+                                f"{current['mean']:.4g} (%{shift * 100:.1f} kayma, standart hataya göre z={z_se:.1f})"
+                            ),
+                            "method": "standard_error",
+                            "z_score": round(max(-1e6, min(1e6, z_se)), 3),
+                            "relative_shift": round(shift, 4),
+                            "baseline_mean": baseline["mean"],
+                            "current_mean": current["mean"],
+                            "baseline_stddev": baseline.get("stddev", 0.0),
+                        },
+                        source="baseline",
+                    )
+                )
 
     # distinct_ratio karşılaştırması yalnızca gerçekten birden fazla değeri
     # olan kolonlarda anlamlıdır — ikili (boolean tarzı) kolonlarda oran,

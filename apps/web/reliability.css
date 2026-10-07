@@ -125,6 +125,18 @@
 dialog{max-width:450px;width:90%;border:1px solid #fffff5;border-radius:28px;padding:30px;background:#f6f4e6;color:#30312e}
 dialog h2{font-weight:400;letter-spacing:-.6px}dialog p{color:#74766a;font-size:12px}
 dialog::backdrop{background:#343b466e;backdrop-filter:blur(5px)}
+.banner{padding:13px 20px;border-radius:20px;margin:0 0 14px;font-size:12px;line-height:1.5}.banner[hidden]{display:none}
+.banner.degraded{background:#ffe9b0;color:#6b4e00}.banner.down{background:#f6d4cd;color:#7a2418}
+.history-panel,.triage-panel,.mute-panel{margin:22px 0}.history-panel h3,.triage-panel h3,.mute-panel h3{font-size:15px;font-weight:500;margin:0 0 12px}
+.spark-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.spark-card{padding:12px 14px;background:#fffefaab;border:1px solid #deded3;border-radius:16px;display:flex;flex-direction:column;gap:4px}
+.spark-card small{font-size:10px;color:#74756b}.spark-card strong{font-size:15px;font-weight:500}
+.spark{width:100%;height:48px;color:#52534b;overflow:visible}.spark polyline{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}
+.spark circle{fill:currentColor}.spark circle.bad{fill:#c0392b}.spark circle.current{stroke:#292a27;stroke-width:2;fill:#ffdf68}.spark circle.bad.current{fill:#c0392b}
+.triage-panel,.mute-panel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:center}
+.triage-panel>h3,.mute-panel>h3,.mute-panel>p,.mute-panel>div{grid-column:1/-1}.mute-panel>p{margin:0;font-size:11px;color:#74756b}
+@media(max-width:820px){.triage-panel,.mute-panel{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.triage-panel,.mute-panel{grid-template-columns:1fr}}
 @media(max-width:1450px){.workspace{margin:32px}}
 @media(max-width:1150px){
 .workspace-head{flex-wrap:wrap}.workspace-tabs{order:3;width:100%;justify-content:center;margin:0}
