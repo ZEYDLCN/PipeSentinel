@@ -1,4 +1,22 @@
-# Pipeline Sentinel AI
+# Pipeline Sentinel
+
+**Human-in-the-loop AI reliability platform for data pipelines.**
+
+Pipeline Sentinel is an early-stage, founder-led B2B SaaS project founded in 2026.
+It detects silent data failures, traces their impact, explains likely root causes
+with evidence, and validates proposed fixes on isolated snapshots for human review.
+
+- **Founded in 2026**
+- **Founder:** Zeyd Alcan
+- **Status:** Working MVP / prototype — PostgreSQL analysis, data contracts,
+  lineage, evidence-based RCA, and isolated fix validation are implemented.
+- Website: https://pipelinesentinel.dev
+- Contact: founder@pipelinesentinel.dev
+- GitHub: https://github.com/ZEYDLCN/PipeSentinel
+
+The prototype supports technical evaluation and pilot preparation. Real-world
+customer outcomes still need pilot validation; human approval remains central
+to the workflow.
 
 ## Gerçek kaynaklar ve onarım doğrulaması
 

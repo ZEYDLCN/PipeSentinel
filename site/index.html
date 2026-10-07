@@ -4,10 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a6adb7">
-  <meta name="description" content="PipeSentinel detects silent data failures, explains likely root causes with evidence, and validates proposed fixes on isolated snapshots.">
-  <title>PipeSentinel — Confidence in data</title>
-  <link rel="alternate" hreflang="en" href="index.html">
-  <link rel="alternate" hreflang="tr" href="tr.html">
+  <meta name="description" content="Pipeline Sentinel is a human-in-the-loop AI reliability platform for data pipelines. Founded in 2026 by Zeyd Alcan. Working MVP / prototype.">
+  <title>Pipeline Sentinel — AI reliability for data pipelines</title>
+  <link rel="canonical" href="https://pipelinesentinel.dev/">
+  <link rel="alternate" hreflang="en" href="https://pipelinesentinel.dev/">
+  <link rel="alternate" hreflang="tr" href="https://pipelinesentinel.dev/tr.html">
+  <link rel="alternate" hreflang="x-default" href="https://pipelinesentinel.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pipeline Sentinel — AI reliability for data pipelines">
+  <meta property="og:description" content="Human-in-the-loop AI reliability platform for data pipelines. Founded in 2026 by Zeyd Alcan. Working MVP / prototype.">
+  <meta property="og:url" content="https://pipelinesentinel.dev/">
+  <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"Organization","name":"Pipeline Sentinel","url":"https://pipelinesentinel.dev/","foundingDate":"2026","founder":{"@type":"Person","name":"Zeyd Alcan"},"email":"founder@pipelinesentinel.dev","description":"Early-stage, founder-led B2B SaaS project building a human-in-the-loop AI reliability platform for data pipelines.","sameAs":["https://github.com/ZEYDLCN/PipeSentinel"]}
+  </script>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,13 +28,14 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="site-shell">
     <header class="site-header">
-      <a class="wordmark" href="#top" aria-label="PipeSentinel home">Pipe<span>Sentinel</span><i aria-hidden="true"></i></a>
+      <a class="wordmark" href="#top" aria-label="Pipeline Sentinel home">Pipeline <span>Sentinel</span><i aria-hidden="true"></i></a>
       <button class="menu-toggle" type="button" aria-label="Open menu" aria-controls="main-nav" aria-expanded="false"><span></span><span></span></button>
       <nav id="main-nav" class="main-nav" aria-label="Main navigation">
         <a href="#problem">Problem</a>
         <a href="#platform">Platform</a>
         <a href="#architecture">Architecture</a>
         <a href="#investor">Investor view</a>
+        <a href="#about">About</a>
       </nav>
       <nav class="language-switch" aria-label="Language"><a href="index.html" lang="en" aria-current="page">EN</a><a href="tr.html" lang="tr">TR</a></nav>
       <a class="header-cta" href="#investor">Explore the project <span aria-hidden="true">↗</span></a>
@@ -36,8 +46,12 @@
         <div class="hero-copy">
           <div class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span> A NEW LAYER OF DATA RELIABILITY <span class="eyebrow-line"></span> 01 / 06</div>
           <h1 id="hero-title">The pipeline ran.<br><em>But is the data right?</em></h1>
-          <p class="hero-lead">PipeSentinel makes silent data failures visible. It detects anomalies, maps the affected pipeline, explains likely root causes with evidence, and tests proposed fixes on isolated data before a person decides what to do.</p>
+          <p class="product-definition">Pipeline Sentinel — Human-in-the-loop AI reliability platform for data pipelines.</p>
+          <p class="hero-lead">Pipeline Sentinel makes silent data failures visible. It detects anomalies, maps the affected pipeline, explains likely root causes with evidence, and tests proposed fixes on isolated data before a person decides what to do.</p>
+          <ul class="project-badges" aria-label="Project details"><li>Founded in 2026</li><li>Working MVP / prototype</li></ul>
+          <p class="founder-byline">Founder: <a href="#about">Zeyd Alcan</a></p>
           <div class="hero-actions"><a class="button button-dark" href="#platform">Explore the platform <span class="button-icon">↗</span></a><a class="text-cta" href="#scenario">Follow an incident <span aria-hidden="true">↗</span></a></div>
+          <div class="project-links"><a href="https://github.com/ZEYDLCN/PipeSentinel">GitHub repository ↗</a><a href="mailto:founder@pipelinesentinel.dev">founder@pipelinesentinel.dev ↗</a></div>
           <div class="hero-proof"><div class="avatar-stack" aria-hidden="true"><span>01</span><span>02</span><span>03</span></div><p><strong>Working prototype, clearly defined scope.</strong><br>PostgreSQL source analysis and evidence-based RCA are available.</p></div>
         </div>
         <div class="hero-visual" aria-label="Preview of the PipeSentinel incident analysis interface">
@@ -95,11 +109,19 @@
 
       <section class="section investor-section" id="investor" aria-labelledby="investor-title"><div class="section-head"><span class="section-index">06 / INVESTOR VIEW</span><p>PRODUCT HYPOTHESIS AND NEXT MILESTONE.</p></div><div class="investor-intro"><div><h2 id="investor-title">Turn data trust into<br><em>a measurable workflow.</em></h2><p class="section-lead">The initial customer hypothesis is small and midsize data teams using PostgreSQL and dbt. The value proposition brings early detection, evidence-backed diagnosis, and controlled fix evaluation into one interface.</p></div><div class="investor-quote"><span>PRODUCT THESIS</span><p>“Shorten the path from alert to action without losing the evidence.”</p></div></div><div class="investor-cards"><article><span>TODAY / WORKING CORE</span><h3>Technical base for pilots</h3><p>Live PostgreSQL source analysis, YAML contracts, quality-approved baselines, dbt/OpenLineage ingestion, RCA, isolated fix validation, dashboard, and API.</p></article><article><span>PILOT / TO VALIDATE</span><h3>Customer value</h3><p>Pilots will measure false alert rate, time to detect and diagnose, human effort per incident, query cost, and the share of fixes validated in real pipelines.</p></article><article><span>NEXT / TARGET</span><h3>Productization</h3><p>Pilot feedback will guide priorities for access control, deployment, broader data sources, and safeguards for production remediation.</p></article></div><div class="investment-note"><span>TRANSPARENT STATUS</span><p>F01–F06 results come from synthetic regression scenarios. They do not claim production accuracy, revenue, customer count, or market share.</p></div></section>
 
-      <section class="section faq-section" id="faq" aria-labelledby="faq-title"><div class="section-head"><span class="section-index">APPENDIX / FAQ</span><p>FOR TECHNICAL EVALUATION.</p></div><div class="faq-layout"><h2 id="faq-title">Clear questions.<br><em>Clear answers.</em></h2><div class="faq-list"><details><summary>Which data sources does PipeSentinel support today?<span>+</span></summary><p>A PostgreSQL connector supports real source analysis. dbt manifests and run results, plus OpenLineage RunEvents, add dependency and change context. Support for other databases is not claimed.</p></details><details><summary>Does AI make decisions on its own?<span>+</span></summary><p>No. Detection uses contracts and statistical rules. Rule-based root-cause hypotheses link back to evidence; the LLM is an optional explanation layer. Actions are presented for human review.</p></details><details><summary>Does fix validation change production data?<span>+</span></summary><p>No. Supported templates are tested on isolated snapshots. An approval record does not run SQL or dbt in production. Automatic production application, rollback, and backfill are outside this version’s scope.</p></details><details><summary>What evidence supports performance and accuracy?<span>+</span></summary><p>The F01–F06 synthetic failure catalog has deterministic regression evaluations and integration tests. Real-world false alert and detection rates still need to be measured in pilots.</p></details></div></div></section>
+      <section class="section about-section" id="about" aria-labelledby="about-title">
+        <div class="section-head"><span class="section-index">ABOUT / FOUNDER</span><p>FOUNDED IN 2026.</p></div>
+        <div class="about-grid">
+          <div><h2 id="about-title">Pipeline Sentinel.<br><em>Founder-led since 2026.</em></h2><p class="section-lead">Pipeline Sentinel is an early-stage, founder-led B2B SaaS project founded in 2026.</p><p class="about-copy">Built for data teams that need to understand silent pipeline failures and review proposed fixes with evidence. The working MVP / prototype combines PostgreSQL source analysis, data contracts, lineage, root-cause analysis, and isolated fix validation.</p></div>
+          <article class="founder-card" aria-labelledby="founder-name"><span class="founder-label">FOUNDER</span><h3 id="founder-name">Zeyd Alcan</h3><p>Founder of Pipeline Sentinel, leading the development of a human-in-the-loop AI reliability platform for data pipelines.</p><dl class="founder-facts"><div><dt>Founded</dt><dd>2026</dd></div><div><dt>Stage</dt><dd>Working MVP / prototype</dd></div></dl><div class="founder-links"><a href="https://pipelinesentinel.dev">Website: pipelinesentinel.dev ↗</a><a href="https://github.com/ZEYDLCN/PipeSentinel">GitHub: ZEYDLCN/PipeSentinel ↗</a><a href="mailto:founder@pipelinesentinel.dev">Contact: founder@pipelinesentinel.dev ↗</a></div></article>
+        </div>
+      </section>
 
-      <section class="closing"><div class="closing-orbit" aria-hidden="true"></div><span class="closing-kicker">PIPE SENTINEL / NEXT STEP</span><h2>See the truth<br><em>behind your data.</em></h2><p>Review the technical architecture, current scope, and pilot hypothesis together.</p><div class="closing-actions"><a class="button button-yellow" href="#architecture">Explore the architecture <span class="button-icon">↗</span></a><button class="print-button" type="button" id="print-page">Save page as PDF ↗</button></div></section>
+      <section class="section faq-section" id="faq" aria-labelledby="faq-title"><div class="section-head"><span class="section-index">APPENDIX / FAQ</span><p>FOR TECHNICAL EVALUATION.</p></div><div class="faq-layout"><h2 id="faq-title">Clear questions.<br><em>Clear answers.</em></h2><div class="faq-list"><details><summary>When was Pipeline Sentinel founded, and by whom?<span>+</span></summary><p>Pipeline Sentinel was founded in 2026 by Zeyd Alcan. It is an early-stage, founder-led B2B SaaS project with a working MVP / prototype. Contact: <a href="mailto:founder@pipelinesentinel.dev">founder@pipelinesentinel.dev</a>.</p></details><details><summary>Which data sources does PipeSentinel support today?<span>+</span></summary><p>A PostgreSQL connector supports real source analysis. dbt manifests and run results, plus OpenLineage RunEvents, add dependency and change context. Support for other databases is not claimed.</p></details><details><summary>Does AI make decisions on its own?<span>+</span></summary><p>No. Detection uses contracts and statistical rules. Rule-based root-cause hypotheses link back to evidence; the LLM is an optional explanation layer. Actions are presented for human review.</p></details><details><summary>Does fix validation change production data?<span>+</span></summary><p>No. Supported templates are tested on isolated snapshots. An approval record does not run SQL or dbt in production. Automatic production application, rollback, and backfill are outside this version’s scope.</p></details><details><summary>What evidence supports performance and accuracy?<span>+</span></summary><p>The F01–F06 synthetic failure catalog has deterministic regression evaluations and integration tests. Real-world false alert and detection rates still need to be measured in pilots.</p></details></div></div></section>
+
+      <section class="closing"><div class="closing-orbit" aria-hidden="true"></div><span class="closing-kicker">PIPELINE SENTINEL / CONTACT THE FOUNDER</span><h2>See the truth<br><em>behind your data.</em></h2><p>Talk to Zeyd Alcan about the working prototype, technical evaluation, or a potential pilot.</p><div class="closing-actions"><a class="button button-yellow" href="mailto:founder@pipelinesentinel.dev">Contact the founder <span class="button-icon">↗</span></a><button class="print-button" type="button" id="print-page">Save page as PDF ↗</button></div><a class="closing-contact" href="mailto:founder@pipelinesentinel.dev">founder@pipelinesentinel.dev</a></section>
     </main>
-    <footer class="site-footer"><a class="wordmark" href="#top">Pipe<span>Sentinel</span><i aria-hidden="true"></i></a><p>Confidence in data. <span>© <span id="year">2026</span> PipeSentinel</span></p><a href="#top">Back to top ↑</a></footer>
+    <footer class="site-footer"><a class="wordmark" href="#top">Pipeline <span>Sentinel</span><i aria-hidden="true"></i></a><p>Founded in 2026 · Founder: Zeyd Alcan <span>© <span id="year">2026</span> Pipeline Sentinel</span></p><nav class="footer-links" aria-label="Project links"><a href="#about">About</a><a href="https://github.com/ZEYDLCN/PipeSentinel">GitHub ↗</a><a href="mailto:founder@pipelinesentinel.dev">Contact ↗</a><a href="#top">Back to top ↑</a></nav></footer>
   </div>
 </body>
 </html>

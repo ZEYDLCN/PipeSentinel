@@ -4,10 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a6adb7">
-  <meta name="description" content="PipeSentinel: veri akışlarındaki sessiz bozulmaları saptayan, nedenini kanıtlarıyla açıklayan ve kontrollü onarım doğrulaması sunan veri güvenilirliği platformu.">
-  <title>PipeSentinel — Veriye duyulan güven</title>
-  <link rel="alternate" hreflang="en" href="index.html">
-  <link rel="alternate" hreflang="tr" href="tr.html">
+  <meta name="description" content="Pipeline Sentinel: veri pipeline'ları için insan onayına dayalı AI güvenilirlik platformu. 2026'da Zeyd Alcan tarafından kuruldu. Çalışan MVP / prototip.">
+  <title>Pipeline Sentinel — Veri pipeline'ları için AI güvenilirliği</title>
+  <link rel="canonical" href="https://pipelinesentinel.dev/tr.html">
+  <link rel="alternate" hreflang="en" href="https://pipelinesentinel.dev/">
+  <link rel="alternate" hreflang="tr" href="https://pipelinesentinel.dev/tr.html">
+  <link rel="alternate" hreflang="x-default" href="https://pipelinesentinel.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pipeline Sentinel — Veri pipeline'ları için AI güvenilirliği">
+  <meta property="og:description" content="Veri pipeline'ları için insan onayına dayalı AI güvenilirlik platformu. Kuruluş: 2026. Kurucu: Zeyd Alcan. Çalışan MVP / prototip.">
+  <meta property="og:url" content="https://pipelinesentinel.dev/tr.html">
+  <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"Organization","name":"Pipeline Sentinel","url":"https://pipelinesentinel.dev/","foundingDate":"2026","founder":{"@type":"Person","name":"Zeyd Alcan"},"email":"founder@pipelinesentinel.dev","description":"2026 yılında kurulmuş, kurucusunun yönettiği erken aşama bir B2B SaaS projesi. Veri pipeline'ları için insan onayına dayalı AI güvenilirlik platformu.","sameAs":["https://github.com/ZEYDLCN/PipeSentinel"]}
+  </script>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,13 +28,14 @@
   <a class="skip-link" href="#main">İçeriğe geç</a>
   <div class="site-shell">
     <header class="site-header">
-      <a class="wordmark" href="#top" aria-label="PipeSentinel ana sayfa">Pipe<span>Sentinel</span><i aria-hidden="true"></i></a>
+      <a class="wordmark" href="#top" aria-label="Pipeline Sentinel ana sayfa">Pipeline <span>Sentinel</span><i aria-hidden="true"></i></a>
       <button class="menu-toggle" type="button" aria-label="Menüyü aç" aria-controls="main-nav" aria-expanded="false"><span></span><span></span></button>
       <nav id="main-nav" class="main-nav" aria-label="Ana menü">
         <a href="#problem">Problem</a>
         <a href="#platform">Platform</a>
         <a href="#architecture">Mimari</a>
         <a href="#investor">Yatırımcı bakışı</a>
+        <a href="#about">Hakkımızda</a>
       </nav>
       <nav class="language-switch" aria-label="Dil"><a href="index.html" lang="en">EN</a><a href="tr.html" lang="tr" aria-current="page">TR</a></nav>
       <a class="header-cta" href="#investor">Projeyi keşfet <span aria-hidden="true">↗</span></a>
@@ -36,9 +46,13 @@
         <div class="hero-copy">
           <div class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span> VERİ GÜVENİLİRLİĞİNİN YENİ KATMANI <span class="eyebrow-line"></span> 01 / 06</div>
           <h1 id="hero-title">Pipeline çalıştı.<br><em>Peki veri doğru mu?</em></h1>
-          <p class="hero-lead">PipeSentinel, sessiz veri bozulmalarını görünür kılar. Anomaliyi saptar, etkilenen akışı gösterir, kök nedeni kanıtlarla açıklar ve önerilen düzeltmeyi insan kararından önce izole veride sınar.</p>
+          <p class="product-definition">Pipeline Sentinel — Veri pipeline'ları için insan onayına dayalı AI güvenilirlik platformu.</p>
+          <p class="hero-lead">Pipeline Sentinel, sessiz veri bozulmalarını görünür kılar. Anomaliyi saptar, etkilenen akışı gösterir, kök nedeni kanıtlarla açıklar ve önerilen düzeltmeyi insan kararından önce izole veride sınar.</p>
+          <ul class="project-badges" aria-label="Proje bilgileri"><li>Kuruluş: 2026</li><li>Çalışan MVP / prototip</li></ul>
+          <p class="founder-byline">Kurucu: <a href="#about">Zeyd Alcan</a></p>
           <div class="hero-actions"><a class="button button-dark" href="#platform">Platformu incele <span class="button-icon">↗</span></a><a class="text-cta" href="#scenario">Bir olayı izle <span aria-hidden="true">↗</span></a></div>
-          <div class="hero-proof"><div class="avatar-stack" aria-hidden="true"><span>01</span><span>02</span><span>03</span></div><p><strong>Canlı prototip, açık teknik kapsam.</strong><br>PostgreSQL kaynak analizi ve kanıta dayalı RCA mevcut.</p></div>
+          <div class="project-links"><a href="https://github.com/ZEYDLCN/PipeSentinel">GitHub deposu ↗</a><a href="mailto:founder@pipelinesentinel.dev">founder@pipelinesentinel.dev ↗</a></div>
+          <div class="hero-proof"><div class="avatar-stack" aria-hidden="true"><span>01</span><span>02</span><span>03</span></div><p><strong>Çalışan prototip, açık teknik kapsam.</strong><br>PostgreSQL kaynak analizi ve kanıta dayalı RCA mevcut.</p></div>
         </div>
         <div class="hero-visual" aria-label="PipeSentinel ürün arayüzünü temsil eden olay analizi önizlemesi">
           <div class="visual-glow"></div>
@@ -97,9 +111,17 @@
 
       <section class="section faq-section" id="faq" aria-labelledby="faq-title"><div class="section-head"><span class="section-index">EK / SIK SORULANLAR</span><p>TEKNİK DEĞERLENDİRME İÇİN.</p></div><div class="faq-layout"><h2 id="faq-title">Net sorular.<br><em>Net cevaplar.</em></h2><div class="faq-list"><details><summary>PipeSentinel bugün hangi veri kaynaklarıyla çalışıyor?<span>+</span></summary><p>Gerçek kaynak analizi için PostgreSQL connector mevcut. dbt manifest ve run sonuçları ile OpenLineage RunEvent'leri bağımlılık ve değişiklik bağlamını besler. Başka veritabanları için genel bağlantı iddiası yoktur.</p></details><details><summary>AI sistemi tek başına karar mı veriyor?<span>+</span></summary><p>Hayır. Tespit contract ve istatistiksel kurallarla yapılır. Kural tabanlı kök neden hipotezleri kanıtlara bağlanır; LLM isteğe bağlı anlatım katmanıdır. Aksiyonlar insan kararına sunulur.</p></details><details><summary>Onarım doğrulaması üretim verisini değiştirir mi?<span>+</span></summary><p>Hayır. Desteklenen sınırlı şablonlar izole snapshot üzerinde denenir. Onay kaydı üretimde SQL veya dbt çalıştırmaz. Otomatik üretim uygulaması, rollback ve backfill bu sürümün kapsamı dışındadır.</p></details><details><summary>Performans ve doğruluk kanıtı nedir?<span>+</span></summary><p>F01–F06 sentetik hata kataloğu için deterministik regresyon değerlendirmesi ve entegrasyon testleri bulunur. Gerçek dünya yanlış alarm ve tespit oranları pilot verisiyle ayrıca ölçülmelidir.</p></details></div></div></section>
 
-      <section class="closing"><div class="closing-orbit" aria-hidden="true"></div><span class="closing-kicker">PIPE SENTINEL / SONRAKİ ADIM</span><h2>Verinin arkasındaki<br><em>gerçeği görün.</em></h2><p>Teknik mimariyi, mevcut kapsamı ve pilot hipotezini birlikte değerlendirin.</p><div class="closing-actions"><a class="button button-yellow" href="#architecture">Teknik mimariye dön <span class="button-icon">↗</span></a><button class="print-button" type="button" id="print-page">Sayfayı PDF olarak kaydet ↗</button></div></section>
+      <section class="section about-section" id="about" aria-labelledby="about-title">
+        <div class="section-head"><span class="section-index">HAKKIMIZDA / KURUCU</span><p>KURULUŞ: 2026.</p></div>
+        <div class="about-grid">
+          <div><h2 id="about-title">Pipeline Sentinel.<br><em>2026'dan beri.</em></h2><p class="section-lead">Pipeline Sentinel, 2026 yılında kurulmuş, kurucusunun yönettiği erken aşama bir B2B SaaS projesidir.</p><p class="about-copy">Veri ekiplerinin sessiz pipeline hatalarını anlaması ve önerilen düzeltmeleri kanıtlarla incelemesi için geliştiriliyor. Çalışan MVP / prototip; PostgreSQL kaynak analizi, veri sözleşmeleri, lineage, kök neden analizi ve izole onarım doğrulamasını bir araya getiriyor.</p></div>
+          <article class="founder-card" aria-labelledby="founder-name"><span class="founder-label">KURUCU</span><h3 id="founder-name">Zeyd Alcan</h3><p>Pipeline Sentinel'in kurucusu. Veri pipeline'ları için insan onayına dayalı AI güvenilirlik platformunun geliştirilmesine öncülük ediyor.</p><dl class="founder-facts"><div><dt>Kuruluş</dt><dd>2026</dd></div><div><dt>Aşama</dt><dd>Çalışan MVP / prototip</dd></div></dl><div class="founder-links"><a href="https://pipelinesentinel.dev">Website: pipelinesentinel.dev ↗</a><a href="https://github.com/ZEYDLCN/PipeSentinel">GitHub: ZEYDLCN/PipeSentinel ↗</a><a href="mailto:founder@pipelinesentinel.dev">İletişim: founder@pipelinesentinel.dev ↗</a></div></article>
+        </div>
+      </section>
+
+      <section class="closing"><div class="closing-orbit" aria-hidden="true"></div><span class="closing-kicker">PIPELINE SENTINEL / KURUCUYLA İLETİŞİM</span><h2>Verinin arkasındaki<br><em>gerçeği görün.</em></h2><p>Çalışan prototip, teknik değerlendirme veya olası bir pilot için Zeyd Alcan ile iletişime geçin.</p><div class="closing-actions"><a class="button button-yellow" href="mailto:founder@pipelinesentinel.dev">Kurucuyla iletişime geç <span class="button-icon">↗</span></a><button class="print-button" type="button" id="print-page">Sayfayı PDF olarak kaydet ↗</button></div><a class="closing-contact" href="mailto:founder@pipelinesentinel.dev">founder@pipelinesentinel.dev</a></section>
     </main>
-    <footer class="site-footer"><a class="wordmark" href="#top">Pipe<span>Sentinel</span><i aria-hidden="true"></i></a><p>Veriye duyulan güven. <span>© <span id="year">2026</span> PipeSentinel</span></p><a href="#top">Başa dön ↑</a></footer>
+    <footer class="site-footer"><a class="wordmark" href="#top">Pipeline <span>Sentinel</span><i aria-hidden="true"></i></a><p>Kuruluş: 2026 · Kurucu: Zeyd Alcan <span>© <span id="year">2026</span> Pipeline Sentinel</span></p><nav class="footer-links" aria-label="Proje bağlantıları"><a href="#about">Hakkımızda</a><a href="https://github.com/ZEYDLCN/PipeSentinel">GitHub ↗</a><a href="mailto:founder@pipelinesentinel.dev">İletişim ↗</a><a href="#top">Başa dön ↑</a></nav></footer>
   </div>
 </body>
 </html>
