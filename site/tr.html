@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#a6adb7">
+  <meta name="description" content="PipeSentinel: veri akışlarındaki sessiz bozulmaları saptayan, nedenini kanıtlarıyla açıklayan ve kontrollü onarım doğrulaması sunan veri güvenilirliği platformu.">
+  <title>PipeSentinel — Veriye duyulan güven</title>
+  <link rel="alternate" hreflang="en" href="index.html">
+  <link rel="alternate" hreflang="tr" href="tr.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">İçeriğe geç</a>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="wordmark" href="#top" aria-label="PipeSentinel ana sayfa">Pipe<span>Sentinel</span><i aria-hidden="true"></i></a>
+      <button class="menu-toggle" type="button" aria-label="Menüyü aç" aria-controls="main-nav" aria-expanded="false"><span></span><span></span></button>
+      <nav id="main-nav" class="main-nav" aria-label="Ana menü">
+        <a href="#problem">Problem</a>
+        <a href="#platform">Platform</a>
+        <a href="#architecture">Mimari</a>
+        <a href="#investor">Yatırımcı bakışı</a>
+      </nav>
+      <nav class="language-switch" aria-label="Dil"><a href="index.html" lang="en">EN</a><a href="tr.html" lang="tr" aria-current="page">TR</a></nav>
+      <a class="header-cta" href="#investor">Projeyi keşfet <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span> VERİ GÜVENİLİRLİĞİNİN YENİ KATMANI <span class="eyebrow-line"></span> 01 / 06</div>
+          <h1 id="hero-title">Pipeline çalıştı.<br><em>Peki veri doğru mu?</em></h1>
+          <p class="hero-lead">PipeSentinel, sessiz veri bozulmalarını görünür kılar. Anomaliyi saptar, etkilenen akışı gösterir, kök nedeni kanıtlarla açıklar ve önerilen düzeltmeyi insan kararından önce izole veride sınar.</p>
+          <div class="hero-actions"><a class="button button-dark" href="#platform">Platformu incele <span class="button-icon">↗</span></a><a class="text-cta" href="#scenario">Bir olayı izle <span aria-hidden="true">↗</span></a></div>
+          <div class="hero-proof"><div class="avatar-stack" aria-hidden="true"><span>01</span><span>02</span><span>03</span></div><p><strong>Canlı prototip, açık teknik kapsam.</strong><br>PostgreSQL kaynak analizi ve kanıta dayalı RCA mevcut.</p></div>
+        </div>
+        <div class="hero-visual" aria-label="PipeSentinel ürün arayüzünü temsil eden olay analizi önizlemesi">
+          <div class="visual-glow"></div>
+          <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div>
+          <div class="product-window">
+            <div class="window-top"><span class="window-brand"><span class="window-mark">✳</span> PipeSentinel</span><span class="window-live"><i></i> SİSTEM AKTİF</span></div>
+            <div class="window-content">
+              <div class="window-overline">VERİ GÜVENİLİRLİĞİ / OLAY DETAYI</div>
+              <div class="window-title-row"><div><h2>Sessiz hatalar, net sinyaller.</h2><p>orders.total_amount · son analiz</p></div><span class="window-arrow">↗</span></div>
+              <div class="mini-chart" aria-hidden="true"><div class="chart-grid"></div><svg viewBox="0 0 460 120" preserveAspectRatio="none"><defs><linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffd75d" stop-opacity=".42"/><stop offset="1" stop-color="#ffd75d" stop-opacity="0"/></linearGradient></defs><path d="M0 92 L48 88 L96 93 L144 83 L192 86 L240 78 L288 82 L336 75 L376 78 L408 20 L460 17 L460 120 L0 120 Z" fill="url(#chartFill)"/><path d="M0 92 L48 88 L96 93 L144 83 L192 86 L240 78 L288 82 L336 75 L376 78 L408 20 L460 17" fill="none" stroke="#d8a714" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="408" cy="20" r="6" fill="#30312e" stroke="#ffdc60" stroke-width="3"/></svg><span class="chart-tag">×100 değişim</span></div>
+              <div class="window-metrics"><div><span>ETKİLENEN ALAN</span><b>orders</b></div><div><span>SİNYAL</span><b>Dağılım + aralık</b></div><div><span>DURUM</span><b class="metric-warning"><i></i> İncelenmeli</b></div></div>
+              <div class="window-insight"><span class="insight-symbol">✳</span><div><strong>Olası birim / ölçek hatası</strong><small>Kanıt: tutarlarda 100 kat artış; sözleşme sınırı aşıldı.</small></div><span>↗</span></div>
+            </div>
+          </div>
+          <div class="floating-card"><div class="floating-icon">✓</div><div><strong>Onarım doğrulaması</strong><span>İzole snapshot · insan onayı</span></div></div>
+          <div class="visual-caption">ÜRÜN ÖNİZLEMESİ <span>↗</span> SENTETİK SENARYO F05</div>
+        </div>
+      </section>
+
+      <div class="ticker" aria-label="Platform bileşenleri"><span>VERİ KALİTESİ</span><b>✳</b><span>KÖK NEDEN ANALİZİ</span><b>✳</b><span>LINEAGE</span><b>✳</b><span>GÜVENLİ ONARIM</span><b>✳</b><span>İNSAN ONAYI</span></div>
+
+      <section class="section problem-section" id="problem" aria-labelledby="problem-title">
+        <div class="section-head"><span class="section-index">01 / SORUN</span><p>BAŞARILI JOB, GÜVENİLİR VERİ DEMEK DEĞİL.</p></div>
+        <div class="problem-grid"><div><h2 id="problem-title">En pahalı veri hataları<br><em>sessizce geçer.</em></h2><p class="section-lead">Bir akış hata vermeden biterken bir kolon kaybolabilir, tutarlar yanlış birimle yüklenebilir veya aynı kayıtlar iki kez yazılabilir. Dashboard yeşildir; kararın dayandığı veri değildir.</p><a class="inline-link" href="#scenario">Gerçek bir senaryoyu incele <span>↗</span></a></div><div class="problem-list"><div class="problem-item"><span>01</span><div><strong>Sinyal dağınık</strong><p>Şema, doluluk, dağılım, hacim ve tazelik farklı araçlarda görünür.</p></div><span>↗</span></div><div class="problem-item"><span>02</span><div><strong>Neden belirsiz</strong><p>Alarm, hangi kaynağın hangi raporu etkilediğini tek başına söylemez.</p></div><span>↗</span></div><div class="problem-item"><span>03</span><div><strong>Düzeltme riskli</strong><p>Kanıt ve önce/sonra karşılaştırması olmadan üretim verisine müdahale etmek zordur.</p></div><span>↗</span></div></div></div>
+      </section>
+
+      <section class="section platform-section" id="platform" aria-labelledby="platform-title">
+        <div class="section-head"><span class="section-index">02 / PLATFORM</span><p>TESPİTTEN KARARA, TEK BİR AKIŞ.</p></div>
+        <div class="section-title-row"><div><h2 id="platform-title">Sorunu gör. Etkisini anla.<br><em>Güvenle karar ver.</em></h2><p class="section-lead">PipeSentinel, kalite sinyalini teknik ve iş bağlamıyla birleştirir. Her adım incelenebilir kanıt üretir.</p></div><span class="section-aside">TEK OLAY MODELİ<br>ALTINDA 06 ADIM ↓</span></div>
+        <div class="process-grid" id="process-grid">
+          <button class="process-step active" type="button" data-step="0" aria-pressed="true"><span class="step-no">01 / BAĞLAN</span><span class="step-icon">◎</span><strong>Kaynağı tanı</strong><small>PostgreSQL kaynağı, sürümlü YAML sözleşme ve kontrollü tarama kapsamı.</small><span class="step-arrow">↗</span></button>
+          <button class="process-step" type="button" data-step="1" aria-pressed="false"><span class="step-no">02 / PROFİLLE</span><span class="step-icon">◫</span><strong>Normali öğren</strong><small>Kolon profilleri; kalite onaylı ve mevsimsel baseline karşılaştırması.</small><span class="step-arrow">↗</span></button>
+          <button class="process-step" type="button" data-step="2" aria-pressed="false"><span class="step-no">03 / TESPİT ET</span><span class="step-icon">⌁</span><strong>Sapmayı yakala</strong><small>Şema, doluluk, dağılım, hacim, tazelik ve contract sinyalleri.</small><span class="step-arrow">↗</span></button>
+          <button class="process-step" type="button" data-step="3" aria-pressed="false"><span class="step-no">04 / İLİŞKİLENDİR</span><span class="step-icon">◇</span><strong>Etkisini göster</strong><small>dbt / OpenLineage bağımlılıkları, olay grupları ve iş kritiklik bilgisi.</small><span class="step-arrow">↗</span></button>
+          <button class="process-step" type="button" data-step="4" aria-pressed="false"><span class="step-no">05 / AÇIKLA</span><span class="step-icon">✳</span><strong>Kanıtı birleştir</strong><small>Kural tabanlı RCA, gerekçeli hipotezler ve isteğe bağlı LLM sentezi.</small><span class="step-arrow">↗</span></button>
+          <button class="process-step" type="button" data-step="5" aria-pressed="false"><span class="step-no">06 / DOĞRULA</span><span class="step-icon">✓</span><strong>Kararı güvenceye al</strong><small>İzole snapshot üzerinde onarım denemesi, önce/sonra farkı ve insan onayı.</small><span class="step-arrow">↗</span></button>
+        </div>
+        <div class="process-detail" role="status" aria-live="polite"><span id="detail-number">01 / 06</span><div><strong id="detail-title">Kaynağı tanı</strong><p id="detail-copy">Salt okunur PostgreSQL bağlantısı, seçili tablo ve partition için kapsamı belli bir analiz başlatır. Bağlantı sırrı metadata yerine ortam değişkeninde kalır.</p></div><span class="detail-mark">✳</span></div>
+      </section>
+
+      <section class="section scenario-section" id="scenario" aria-labelledby="scenario-title">
+        <div class="section-head"><span class="section-index">03 / ÜRÜN DENEYİMİ</span><p>SOYUT ALARM DEĞİL, AÇIKLANABİLİR OLAY.</p></div>
+        <div class="scenario-layout"><div class="scenario-intro"><span class="yellow-label">KONTROLLÜ HATA KATALOĞU · F01—F06</span><h2 id="scenario-title">Bir anomaliyi<br><em>sonuna kadar izle.</em></h2><p>Altı sentetik senaryo şema kaybından tazelik gecikmesine kadar farklı bozulmaları tekrar üretir. Her biri beklenen sinyal ve kök neden hipoteziyle değerlendirilir.</p><div class="scenario-tabs" role="tablist" aria-label="Senaryo seçimi"><button id="tab-f05" type="button" role="tab" aria-selected="true" aria-controls="scenario-panel" data-scenario="f05">F05 · Ölçek hatası</button><button id="tab-f04" type="button" role="tab" aria-selected="false" aria-controls="scenario-panel" data-scenario="f04">F04 · Çift yükleme</button><button id="tab-f03" type="button" role="tab" aria-selected="false" aria-controls="scenario-panel" data-scenario="f03">F03 · Null artışı</button></div></div><div class="scenario-panel" id="scenario-panel" role="tabpanel" aria-labelledby="tab-f05" tabindex="0"><div class="panel-heading"><span><i></i> OLAY İNCELEMESİ</span><span id="scenario-code">F05 / 06</span></div><div class="incident-line"><div class="incident-icon">!</div><div><span id="scenario-type">DAĞILIM + ARALIK</span><h3 id="scenario-name">TL → kuruş ölçek hatası</h3><p id="scenario-description">orders.total_amount değerleri beklenen düzeyin yaklaşık 100 katına çıkar.</p></div></div><div class="evidence-list"><div><span>01 / TESPİT</span><p id="scenario-detection">Contract aralık ihlali ve baseline dağılım sapması birlikte görünür.</p></div><div><span>02 / KÖK NEDEN</span><p id="scenario-cause">Kural motoru, olası birim / ölçek değişimini kanıta bağlı hipotez olarak sunar.</p></div><div><span>03 / KARAR</span><p id="scenario-action">Sınırlı scale şablonu izole snapshot üzerinde denenir; sonuç insan incelemesine sunulur.</p></div></div><div class="panel-footer"><span>GERÇEK ÜRÜNDEKİ SENTETİK TEST SENARYOSU</span><span>↗</span></div></div></div>
+      </section>
+
+      <section class="section architecture-section" id="architecture" aria-labelledby="architecture-title">
+        <div class="section-head"><span class="section-index">04 / TEKNİK DERİNLİK</span><p>DENETLENEBİLİR BİR MİMARİ.</p></div>
+        <div class="architecture-top"><div><h2 id="architecture-title">AI, kanıtın üstünde.<br><em>Kararın merkezinde değil.</em></h2><p class="section-lead">Anomali tespiti deterministik contract kuralları ve istatistiksel karşılaştırmayla yapılır. LLM kapalı olsa da çekirdek akış çalışır; açıldığında kanıtları daha anlaşılır bir anlatıma dönüştürür.</p></div><div class="stack-stamp"><span>ÇALIŞAN YIĞIN</span><strong>Python<br>FastAPI<br>PostgreSQL</strong><small>Statik HTML / CSS / JS arayüz</small></div></div>
+        <div class="architecture-flow" aria-label="PipeSentinel mimari akışı"><div><span class="flow-kicker">GİRDİ</span><strong>PostgreSQL<br>+ dbt / OpenLineage</strong><small>Kaynak ve bağımlılıklar</small></div><span class="flow-connector">→</span><div><span class="flow-kicker">KALİTE MOTORU</span><strong>Profil + sözleşme<br>+ baseline</strong><small>Sinyal ve risk puanı</small></div><span class="flow-connector">→</span><div><span class="flow-kicker">ANALİZ</span><strong>Lineage + RCA<br>+ iş etkisi</strong><small>Kanıtlı hipotez</small></div><span class="flow-connector">→</span><div><span class="flow-kicker">KONTROL</span><strong>İzole doğrulama<br>+ onay kaydı</strong><small>Üretimde otomatik yazma yok</small></div></div>
+        <div class="technical-grid"><article><span class="technical-icon">01</span><h3>Gerçek kaynak, kontrollü erişim</h3><p>PostgreSQL connector kaynağı salt okunur transaction ile tarar. Kapsam, satır bütçesi, yöntem ve süre sonuçta görünür; kısmi tarama tam tarama gibi sunulmaz.</p></article><article><span class="technical-icon">02</span><h3>Kirlenmeyen referans</h3><p>Boş veya sinyalli analiz baseline olamaz. Temiz aday operatör kabulü bekler; mevsimsel karşılaştırma yalnızca yeterli onaylı geçmişte yapılır.</p></article><article><span class="technical-icon">03</span><h3>İlişkili etki görünürlüğü</h3><p>dbt manifest ve OpenLineage olayları bağımlılık grafını besler. Olaylar birlikte gruplandırılır; zamansal yakınlık kesin ortak neden olarak gösterilmez.</p></article><article><span class="technical-icon">04</span><h3>Sınırlı onarım doğrulaması</h3><p>Scale ve birebir kayıt tekilleştirme şablonları izole snapshot üzerinde çalışır. Önce/sonra profil, sözleşme ve kontrol grubu karşılaştırılır.</p></article></div>
+      </section>
+
+      <section class="section trust-section" aria-labelledby="trust-title"><div class="trust-copy"><div class="section-head"><span class="section-index">05 / GÜVEN SINIRI</span></div><h2 id="trust-title">Kontrollü otomasyon.<br><em>Açık sorumluluk.</em></h2><p>PipeSentinel üretim verisine kendi başına düzeltme yazmaz. Onay kaydı, SQL çalıştırma anlamına gelmez. Snapshot doğrulaması bir önerinin sözleşmeye uyduğunu gösterir; işletme doğruluğu ve tüm downstream sonuçlar için garanti vermez.</p><a class="button button-light" href="#faq">Kapsam sınırlarını oku <span class="button-icon">↗</span></a></div><div class="trust-art" aria-hidden="true"><div class="trust-ring trust-ring-a"></div><div class="trust-ring trust-ring-b"></div><div class="trust-core">✳</div><span class="trust-tag tag-one">KANIT</span><span class="trust-tag tag-two">ONAY</span><span class="trust-tag tag-three">DENETİM</span></div></section>
+
+      <section class="section investor-section" id="investor" aria-labelledby="investor-title"><div class="section-head"><span class="section-index">06 / YATIRIMCI BAKIŞI</span><p>ÜRÜN HİPOTEZİ VE SONRAKİ EŞİK.</p></div><div class="investor-intro"><div><h2 id="investor-title">Veri güveni,<br><em>ölçülebilir bir iş akışına.</em></h2><p class="section-lead">İlk hedef müşteri hipotezi, PostgreSQL ve dbt kullanan küçük ve orta ölçekli veri ekipleri. Değer önerisi: aynı arayüzde erken tespit, kanıtlı teşhis ve kontrollü onarım değerlendirmesi.</p></div><div class="investor-quote"><span>ÜRÜN TEZİ</span><p>“Alarmdan aksiyona giden süreyi, kanıtı kaybetmeden kısalt.”</p></div></div><div class="investor-cards"><article><span>BUGÜN / ÇALIŞAN ÇEKİRDEK</span><h3>Pilot için teknik temel</h3><p>Gerçek PostgreSQL kaynak analizi, YAML sözleşme, kalite onaylı baseline, dbt/OpenLineage ingestion, RCA, izole onarım doğrulaması, dashboard ve API.</p></article><article><span>PİLOT / DOĞRULANACAK</span><h3>Müşteri değeri</h3><p>Gerçek akışlarda yanlış alarm oranı, tespit ve teşhis süresi, incident başına insan emeği, sorgu maliyeti ve doğrulanan çözüm oranı ölçülecek.</p></article><article><span>SONRAKİ AŞAMA / HEDEF</span><h3>Ürünleşme</h3><p>Pilot geri bildirimiyle erişim, dağıtım, daha geniş veri kaynakları ve üretim onarımının güvenlik koşulları önceliklendirilecek.</p></article></div><div class="investment-note"><span>ŞEFFAF DURUM</span><p>F01–F06 sonuçları sentetik regresyon senaryolarına aittir. Üretim doğruluğu, gelir, müşteri sayısı veya pazar payı iddiası olarak kullanılmaz.</p></div></section>
+
+      <section class="section faq-section" id="faq" aria-labelledby="faq-title"><div class="section-head"><span class="section-index">EK / SIK SORULANLAR</span><p>TEKNİK DEĞERLENDİRME İÇİN.</p></div><div class="faq-layout"><h2 id="faq-title">Net sorular.<br><em>Net cevaplar.</em></h2><div class="faq-list"><details><summary>PipeSentinel bugün hangi veri kaynaklarıyla çalışıyor?<span>+</span></summary><p>Gerçek kaynak analizi için PostgreSQL connector mevcut. dbt manifest ve run sonuçları ile OpenLineage RunEvent'leri bağımlılık ve değişiklik bağlamını besler. Başka veritabanları için genel bağlantı iddiası yoktur.</p></details><details><summary>AI sistemi tek başına karar mı veriyor?<span>+</span></summary><p>Hayır. Tespit contract ve istatistiksel kurallarla yapılır. Kural tabanlı kök neden hipotezleri kanıtlara bağlanır; LLM isteğe bağlı anlatım katmanıdır. Aksiyonlar insan kararına sunulur.</p></details><details><summary>Onarım doğrulaması üretim verisini değiştirir mi?<span>+</span></summary><p>Hayır. Desteklenen sınırlı şablonlar izole snapshot üzerinde denenir. Onay kaydı üretimde SQL veya dbt çalıştırmaz. Otomatik üretim uygulaması, rollback ve backfill bu sürümün kapsamı dışındadır.</p></details><details><summary>Performans ve doğruluk kanıtı nedir?<span>+</span></summary><p>F01–F06 sentetik hata kataloğu için deterministik regresyon değerlendirmesi ve entegrasyon testleri bulunur. Gerçek dünya yanlış alarm ve tespit oranları pilot verisiyle ayrıca ölçülmelidir.</p></details></div></div></section>
+
+      <section class="closing"><div class="closing-orbit" aria-hidden="true"></div><span class="closing-kicker">PIPE SENTINEL / SONRAKİ ADIM</span><h2>Verinin arkasındaki<br><em>gerçeği görün.</em></h2><p>Teknik mimariyi, mevcut kapsamı ve pilot hipotezini birlikte değerlendirin.</p><div class="closing-actions"><a class="button button-yellow" href="#architecture">Teknik mimariye dön <span class="button-icon">↗</span></a><button class="print-button" type="button" id="print-page">Sayfayı PDF olarak kaydet ↗</button></div></section>
+    </main>
+    <footer class="site-footer"><a class="wordmark" href="#top">Pipe<span>Sentinel</span><i aria-hidden="true"></i></a><p>Veriye duyulan güven. <span>© <span id="year">2026</span> PipeSentinel</span></p><a href="#top">Başa dön ↑</a></footer>
+  </div>
+</body>
+</html>
